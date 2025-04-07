@@ -50,7 +50,7 @@ impl Loader {
     pub async fn load_statically_linked<T: Node + 'static>(
         &mut self,
         node: NodeID,
-        configuration: YAMLValue,
+        configuration: serde_yml::Value,
     ) -> eyre::Result<()> {
         let inputs = Inputs::new(node, self.flows.receivers.clone());
         let outputs = Outputs::new(node, self.clock.clone(), self.flows.senders.clone());
@@ -68,39 +68,59 @@ impl Loader {
         Ok(())
     }
 
-    pub async fn load_dynamically_linked(
+    pub async fn load_from_url(
         &mut self,
         node: NodeID,
         url: Url,
-        configuration: YAMLValue,
+        configuration: serde_yml::Value,
     ) -> eyre::Result<()> {
-        let path = match url.scheme() {
-            "file" => url
-                .to_file_path()
-                .map_err(|_| eyre::eyre!(format!("Invalid file path: {}", url)))?,
-            _ => return Err(eyre::eyre!("Unsupported scheme")),
-        };
-
-        let library = unsafe { Library::new(path)? };
-        let constructor = unsafe {
-            library
-                .get::<*mut DynamicallyLinkedNodeInstance>(b"FLARROW_NODE")?
-                .read()
-        };
-
         let inputs = Inputs::new(node, self.flows.receivers.clone());
         let outputs = Outputs::new(node, self.clock.clone(), self.flows.senders.clone());
 
-        self.nodes.insert(
-            node,
-            RuntimeNode::DynamicallyLinked(DynamicallyLinkedNode {
-                _library: library,
-                handle: (constructor)(inputs, outputs, configuration)
-                    .await
-                    .wrap_err("Failed to await for dynamically linked node")?
-                    .wrap_err("Failed to create dynamically linked node")?,
-            }),
-        );
+        let kind = flarrow_url::prelude::process_url(url.clone())
+            .await
+            .wrap_err(eyre::eyre!("Could not process url {:?}", url))?;
+
+        match kind {
+            flarrow_url::prelude::NodeKind::Builtin(builtin) => {
+                self.nodes.insert(
+                    node,
+                    RuntimeNode::StaticallyLinked(
+                        flarrow_builtins::prelude::new_builtin(
+                            builtin,
+                            inputs,
+                            outputs,
+                            configuration,
+                        )
+                        .await
+                        .wrap_err("Failed to create statically linked node")?,
+                    ),
+                );
+            }
+            flarrow_url::prelude::NodeKind::DynamicallyLinkedLibrary(path) => {
+                let library = unsafe { Library::new(path)? };
+                let constructor = unsafe {
+                    library
+                        .get::<*mut DynamicallyLinkedNodeInstance>(b"FLARROW_NODE")?
+                        .read()
+                };
+
+                let inputs = Inputs::new(node, self.flows.receivers.clone());
+                let outputs = Outputs::new(node, self.clock.clone(), self.flows.senders.clone());
+
+                self.nodes.insert(
+                    node,
+                    RuntimeNode::DynamicallyLinked(DynamicallyLinkedNode {
+                        _library: library,
+                        handle: (constructor)(inputs, outputs, configuration)
+                            .await
+                            .wrap_err("Failed to await for dynamically linked node")?
+                            .wrap_err("Failed to create dynamically linked node")?,
+                    }),
+                );
+            }
+            flarrow_url::prelude::NodeKind::PythonScript(_) => unimplemented!(),
+        }
 
         Ok(())
     }

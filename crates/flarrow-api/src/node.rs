@@ -7,6 +7,7 @@ pub enum NodeResult {
 }
 
 pub trait Node: Send + Sync {
+    #[allow(clippy::new_ret_no_self)]
     fn new(inputs: Inputs, outputs: Outputs, configuration: serde_yml::Value) -> NodeNewResult
     where
         Self: Sized;
