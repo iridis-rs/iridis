@@ -1,5 +1,5 @@
 [package]
-name = "flarrow-runtime"
+name = "flarrow-url"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true
@@ -16,10 +16,8 @@ version.workspace = true
 [dependencies]
 eyre = { workspace = true }
 tokio = { workspace = true }
-uhlc = { workspace = true }
+uuid = { workspace = true }
 url = { workspace = true }
-libloading = { workspace = true }
+reqwest = { workspace = true }
 
-flarrow-url = { workspace = true }
-flarrow-api = { workspace = true }
 flarrow-builtins = { workspace = true }

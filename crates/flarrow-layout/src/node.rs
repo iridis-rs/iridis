@@ -7,6 +7,12 @@ use crate::prelude::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NodeID(pub Uuid);
 
+impl Default for NodeID {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NodeID {
     pub fn new() -> Self {
         NodeID(Uuid::new_v4())
@@ -26,6 +32,12 @@ pub struct NodeIO {
 
     pub inputs: HashSet<InputID>,
     pub outputs: HashSet<OutputID>,
+}
+
+impl Default for NodeIO {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl NodeIO {

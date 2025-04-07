@@ -2,11 +2,14 @@
 members = [
     "crates/flarrow-api",
     "crates/flarrow-api-derive",
+    "crates/flarrow-builtins",
     "crates/flarrow-layout",
     "crates/flarrow-message",
     "crates/flarrow-message-derive",
     "crates/flarrow-message-python",
     "crates/flarrow-runtime",
+    "crates/flarrow-runtime-plan",
+    "crates/flarrow-url",
 ]
 resolver = "3"
 
@@ -41,12 +44,22 @@ tokio = { version = "1", features = [
     "sync",
     "time",
     "signal",
+    "fs",
+] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+    "charset",
+    "http2",
+    "macos-system-configuration",
 ] }
 
 flarrow-layout = { version = "0.1.0", path = "crates/flarrow-layout" }
 flarrow-api = { version = "0.1.0", path = "crates/flarrow-api" }
 flarrow-api-derive = { version = "0.1.0", path = "crates/flarrow-api-derive" }
 flarrow-runtime = { version = "0.1.0", path = "crates/flarrow-runtime" }
+flarrow-runtime-plan = { version = "0.1.0", path = "crates/flarrow-runtime-plan" }
+flarrow-builtins = { version = "0.1.0", path = "crates/flarrow-builtins" }
+flarrow-url = { version = "0.1.0", path = "crates/flarrow-url" }
 
 flarrow-message = { version = "0.1.0", path = "crates/flarrow-message" }
 flarrow-message-derive = { version = "0.1.0", path = "crates/flarrow-message-derive" }

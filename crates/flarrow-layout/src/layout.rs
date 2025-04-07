@@ -7,6 +7,12 @@ pub struct DataflowLayout {
     pub outputs: HashSet<OutputID>,
 }
 
+impl Default for DataflowLayout {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DataflowLayout {
     pub fn new() -> Self {
         Self {

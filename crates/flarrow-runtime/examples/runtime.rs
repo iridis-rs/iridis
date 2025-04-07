@@ -14,7 +14,7 @@ impl Node for MyOperator {
     async fn new(
         mut inputs: Inputs,
         mut outputs: Outputs,
-        _: YAMLValue,
+        _: serde_yml::Value,
     ) -> eyre::Result<Box<dyn Node>>
     where
         Self: Sized,
@@ -65,19 +65,19 @@ async fn main() -> Result<()> {
 
     let runtime = DataflowRuntime::new(flows, async move |loader: &mut Loader| {
         loader
-            .load_statically_linked::<MyOperator>(operator, YAMLValue::from(""))
+            .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
             .await
             .wrap_err("Failed to load MyOperator")?;
 
-        let source_file = Url::parse(&format!("{}/libsource.so", examples))?;
+        let source_file = Url::parse("builtin:///timer")?;
         let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
 
         loader
-            .load_dynamically_linked(source, source_file, YAMLValue::from(""))
+            .load_from_url(source, source_file, serde_yml::from_str("frequency: 2.0")?)
             .await
             .wrap_err("Failed to load source")?;
         loader
-            .load_dynamically_linked(sink, sink_file, YAMLValue::from(""))
+            .load_from_url(sink, sink_file, serde_yml::Value::from(""))
             .await
             .wrap_err("Failed to load sink")?;
 

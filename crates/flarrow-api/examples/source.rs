@@ -7,7 +7,7 @@ pub struct MySource {
 
 #[node(runtime = "runtime_spawn")]
 impl Node for MySource {
-    async fn new(_: Inputs, mut outputs: Outputs, _: YAMLValue) -> Result<Box<dyn Node>>
+    async fn new(_: Inputs, mut outputs: Outputs, _: serde_yml::Value) -> Result<Box<dyn Node>>
     where
         Self: Sized,
     {

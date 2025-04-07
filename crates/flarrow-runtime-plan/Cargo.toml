@@ -1,5 +1,5 @@
 [package]
-name = "flarrow-runtime"
+name = "flarrow-runtime-plan"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true
@@ -14,12 +14,3 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-eyre = { workspace = true }
-tokio = { workspace = true }
-uhlc = { workspace = true }
-url = { workspace = true }
-libloading = { workspace = true }
-
-flarrow-url = { workspace = true }
-flarrow-api = { workspace = true }
-flarrow-builtins = { workspace = true }

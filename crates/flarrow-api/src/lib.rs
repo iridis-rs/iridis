@@ -18,7 +18,7 @@ pub mod prelude {
         task::JoinHandle,
     };
 
-    pub use serde_yml::Value as YAMLValue;
+    pub use serde_yml;
 
     pub use eyre::{Context, OptionExt, Result};
 }
