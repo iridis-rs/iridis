@@ -13,7 +13,7 @@ Flarrow (flow + arrow) is a rust runtime/framework for building dataflow applica
 
 The first thing to do is to define the layout of your application. This is done by creating a `DataflowLayout` instance and then adding nodes to it. When creating a node the user provides a closure that takes a mutable reference to a `NodeIO` and returns optionally a future that resolves to a tuple of input and output streams. This is `async` compatible, so you can use `async` code inside the closure if you want to perform additional asynchronous operations.
 
-```Rust
+```rust
 #[tokio::main]
 async fn main() {
     let mut layout = DataflowLayout::new();
@@ -38,7 +38,7 @@ async fn main() {
 
 You must then create the implementation of your nodes. You can either make a rust library or a `cdylib` to be passed to the `flarrow-runtime`. It relies on a `tokio` runtime: it will choose the current one if there is one available (`rlib`) or create a new one if none is available (`cdylib`). You can totally control the runtime by passing a custom function instead of `default_runtime`.
 
-```Rust
+```rust
 use flarrow_api::prelude::*;
 
 #[derive(Node)]
@@ -69,7 +69,7 @@ impl Node for MySink {
 
 Where `default_runtime` is:
 
-```Rust
+```rust
 static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
     std::sync::LazyLock::new(|| tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime"));
 
@@ -87,7 +87,7 @@ fn default_runtime<T: Send + 'static>(
 
 Now you've created a layout and implemented your nodes, you can create the connections between the nodes and load the implementation for each one. This is done by creating a `Flows` struct first, and then creating a `DataflowRuntime` instance. As you can see, the flows creation are defined in an `async` closure so you can use `async` code in it. You can also see that you can load the implementation for each node using the either `load_statically_linked` or `load_from_url`. The first one is intented to be used with `rlib` nodes, and the second one is intented to be used with `cdylib` or `builtin` nodes (which are `rlib` nodes already integrated into the runtime).
 
-```Rust
+```rust
 let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
     connector.connect(op_in, output)?;
     connector.connect(input, op_out)?;
