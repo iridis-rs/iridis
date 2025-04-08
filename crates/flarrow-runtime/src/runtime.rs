@@ -11,7 +11,7 @@ pub struct DataflowRuntime {
 impl DataflowRuntime {
     pub async fn new(
         flows: Flows,
-        url_plugin: RuntimeUrlPlugin,
+        url_plugin: Option<RuntimeUrlPlugin>,
         load: impl AsyncFn(&mut Loader) -> Result<()>,
     ) -> eyre::Result<Self> {
         let clock = Arc::new(uhlc::HLC::default());

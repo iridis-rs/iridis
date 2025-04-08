@@ -38,10 +38,6 @@ impl Node for MyOperator {
             self.output
                 .send(format!("{} - {}", self.counter, message))
                 .wrap_err("Failed to send message")?;
-
-            if self.counter >= 20 {
-                break;
-            }
         }
 
         Ok(())
@@ -65,9 +61,9 @@ async fn main() -> Result<()> {
         .await;
 
     let layout = Arc::new(layout);
-    let flows = Flows::new(layout.clone(), async move |connectors: &mut Connectors| {
-        connectors.connect(op_in, output)?;
-        connectors.connect(input, op_out)?;
+    let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
+        connector.connect(op_in, output)?;
+        connector.connect(input, op_out)?;
 
         Ok(())
     })
@@ -78,9 +74,11 @@ async fn main() -> Result<()> {
 
     let runtime = DataflowRuntime::new(
         flows,
-        RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
-            .await
-            .wrap_err("Failed to load URL plugin")?,
+        Some(
+            RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
+                .await
+                .wrap_err("Failed to load URL plugin")?,
+        ),
         async move |loader: &mut Loader| {
             loader
                 .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))

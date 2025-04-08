@@ -15,9 +15,9 @@ pub struct Flows {
 impl Flows {
     pub async fn new(
         layout: Arc<DataflowLayout>,
-        flows: impl AsyncFn(&mut Connectors) -> Result<()>,
+        flows: impl AsyncFn(&mut Connector) -> Result<()>,
     ) -> Result<Self> {
-        let mut connectors = Connectors::new(layout)?;
+        let mut connectors = Connector::new(layout)?;
 
         flows(&mut connectors).await?;
 
@@ -28,14 +28,14 @@ impl Flows {
     }
 }
 
-pub struct Connectors {
+pub struct Connector {
     layout: Arc<DataflowLayout>,
 
     senders: HashMap<OutputID, Sender<DataflowMessage>>,
     receivers: HashMap<InputID, Receiver<DataflowMessage>>,
 }
 
-impl Connectors {
+impl Connector {
     pub fn new(layout: Arc<DataflowLayout>) -> Result<Self> {
         Ok(Self {
             layout,
