@@ -41,7 +41,7 @@ libloading = "0.8"
 
 proc-macro2 = "1"
 quote = "1"
-syn = "2"
+syn = { version = "2", features = ["full"] }
 
 arrow-data = "54"
 arrow-schema = "54"
