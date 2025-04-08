@@ -15,9 +15,9 @@ resolver = "3"
 
 [workspace.package]
 authors = ["Enzo Le Van <dev@enzo-le-van.fr>"]
-description = ""
+description = "flarrow (flow + arrow) is a rust runtime/framework for building dataflow applications."
 edition = "2024"
-homepage = "flarrow (flow + arrow) is a rust runtime/framework for building dataflow applications."
+homepage = ""
 keywords = []
 readme = "README.md"
 rust-version = "1.85"
