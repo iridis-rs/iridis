@@ -70,3 +70,6 @@ flarrow-url-default = { version = "0.1.0", path = "crates/flarrow-url-default" }
 
 flarrow-message = { version = "0.1.0", path = "crates/flarrow-message" }
 flarrow-message-derive = { version = "0.1.0", path = "crates/flarrow-message-derive" }
+
+[workspace.release]
+rate-limit.new-packages = 10
