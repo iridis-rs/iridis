@@ -1,4 +1,5 @@
-use arrow::array::*;
+use arrow_array::*;
+use arrow_data::*;
 use flarrow_message::prelude::*;
 
 #[derive(Debug, ArrowMessage)]
@@ -14,7 +15,7 @@ struct Image {
     metadata: Option<Metadata>,
 }
 
-fn main() -> arrow::error::Result<()> {
+fn main() -> ArrowResult<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {

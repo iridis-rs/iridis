@@ -1,4 +1,5 @@
-use arrow::array::*;
+use arrow_array::*;
+use arrow_data::*;
 use flarrow_message::prelude::*;
 
 #[derive(Debug, ArrowMessage)]
@@ -24,7 +25,7 @@ struct Output {
     metadata: Metadata,
 }
 
-fn main() -> arrow::error::Result<()> {
+fn main() -> ArrowResult<()> {
     let output = Output {
         first_array: UInt8Array::from(vec![1, 2, 3]),
         second_array: Float32Array::from(vec![4.0, 5.0, 6.0]),

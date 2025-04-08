@@ -49,7 +49,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
 
     let expanded = quote! {
         impl ArrowMessage for #name {
-            fn field(name: impl Into<String>) -> Field {
+            fn field(name: impl Into<String>) -> arrow_schema::Field {
                 make_union_fields(
                     name,
                     vec![
@@ -58,7 +58,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
                 )
             }
 
-            fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
+            fn try_from_arrow(data: arrow_data::ArrayData) -> ArrowResult<Self>
             where
                 Self: Sized,
             {
@@ -69,7 +69,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
                 })
             }
 
-            fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
+            fn try_into_arrow(self) -> ArrowResult<arrow_array::ArrayRef> {
                 let union_fields = get_union_fields::<Self>()?;
 
                 make_union_array(
@@ -81,18 +81,18 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
             }
         }
 
-        impl TryFrom<arrow::array::ArrayData> for #name {
-            type Error = arrow::error::ArrowError;
+        impl TryFrom<arrow_data::ArrayData> for #name {
+            type Error = arrow_schema::ArrowError;
 
-            fn try_from(data: arrow::array::ArrayData) -> arrow::error::Result<Self> {
+            fn try_from(data: arrow_data::ArrayData) -> ArrowResult<Self> {
                 #name::try_from_arrow(data)
             }
         }
 
-        impl TryFrom<#name> for arrow::array::ArrayData {
-            type Error = arrow::error::ArrowError;
+        impl TryFrom<#name> for arrow_data::ArrayData {
+            type Error = arrow_schema::ArrowError;
 
-            fn try_from(item: #name) -> arrow::error::Result<Self> {
+            fn try_from(item: #name) -> ArrowResult<Self> {
                 item.try_into_arrow().map(|array| array.into_data())
             }
         }
@@ -131,44 +131,44 @@ fn enum_derive(name: Ident, variants: Punctuated<Variant, Token![,]>) -> TokenSt
                 }
             }
 
-            pub fn try_from_string(s: String) -> arrow::error::Result<Self> {
+            pub fn try_from_string(s: String) -> ArrowResult<Self> {
                 match s.as_str() {
                     #(#try_from_string_arms)*
-                    _ => Err(arrow::error::ArrowError::ParseError(format!("Invalid value for {}: {}", stringify!(#name), s))),
+                    _ => Err(arrow_schema::ArrowError::ParseError(format!("Invalid value for {}: {}", stringify!(#name), s))),
                 }
             }
         }
 
         impl ArrowMessage for #name {
-            fn field(name: impl Into<String>) -> Field {
+            fn field(name: impl Into<String>) -> arrow_schema::Field {
                 String::field(name)
             }
 
-            fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
+            fn try_from_arrow(data: arrow_data::ArrayData) -> ArrowResult<Self>
             where
                 Self: Sized,
             {
                 Encoding::try_from_string(String::try_from_arrow(data)?)
             }
 
-            fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
+            fn try_into_arrow(self) -> ArrowResult<arrow_array::ArrayRef> {
                 String::try_into_arrow(self.into_string())
             }
         }
 
 
-        impl TryFrom<arrow::array::ArrayData> for #name {
-            type Error = arrow::error::ArrowError;
+        impl TryFrom<arrow_data::ArrayData> for #name {
+            type Error = arrow_schema::ArrowError;
 
-            fn try_from(data: arrow::array::ArrayData) -> arrow::error::Result<Self> {
+            fn try_from(data: arrow_data::ArrayData) -> ArrowResult<Self> {
                 #name::try_from_arrow(data)
             }
         }
 
-        impl TryFrom<#name> for arrow::array::ArrayData {
-            type Error = arrow::error::ArrowError;
+        impl TryFrom<#name> for arrow_data::ArrayData {
+            type Error = arrow_schema::ArrowError;
 
-            fn try_from(item: #name) -> arrow::error::Result<Self> {
+            fn try_from(item: #name) -> ArrowResult<Self> {
                 item.try_into_arrow().map(|array| array.into_data())
             }
         }

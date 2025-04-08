@@ -1,20 +1,22 @@
 use std::sync::Arc;
 
-use arrow::{
-    array::{
-        Array, ArrayData, ArrayRef, ArrowPrimitiveType, BooleanArray, Float32Array, Float64Array,
-        Int8Array, Int16Array, Int32Array, Int64Array, NullArray, PrimitiveArray, StringArray,
-        UInt8Array, UInt16Array, UInt32Array, UInt64Array,
-    },
-    datatypes::{DataType, Field},
-    error::{ArrowError, Result},
+use arrow_data::ArrayData;
+
+use arrow_array::{
+    Array, ArrayRef, ArrowPrimitiveType, BooleanArray, Float32Array, Float64Array, Int8Array,
+    Int16Array, Int32Array, Int64Array, NullArray, PrimitiveArray, StringArray, UInt8Array,
+    UInt16Array, UInt32Array, UInt64Array,
 };
+
+use arrow_schema::{ArrowError, DataType, Field};
+
+use crate::prelude::*;
 
 pub trait ArrowMessage {
     fn field(name: impl Into<String>) -> Field;
 
-    fn try_into_arrow(self) -> Result<ArrayRef>;
-    fn try_from_arrow(data: ArrayData) -> Result<Self>
+    fn try_into_arrow(self) -> ArrowResult<ArrayRef>;
+    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
     where
         Self: Sized;
 }
@@ -27,14 +29,14 @@ where
         T::field(name).with_nullable(true)
     }
 
-    fn try_into_arrow(self) -> Result<ArrayRef> {
+    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
         match self {
             Some(value) => value.try_into_arrow(),
             None => Ok(Arc::new(NullArray::new(0)) as ArrayRef),
         }
     }
 
-    fn try_from_arrow(data: ArrayData) -> Result<Self>
+    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
     where
         Self: Sized,
     {
@@ -53,11 +55,11 @@ where
         Field::new(name, T::DATA_TYPE, false)
     }
 
-    fn try_into_arrow(self) -> Result<ArrayRef> {
+    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
         Ok(Arc::new(self) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> Result<Self>
+    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
     where
         Self: Sized,
     {
@@ -72,11 +74,11 @@ macro_rules! impl_arrow_field {
                 Field::new(name, $data_type, false)
             }
 
-            fn try_into_arrow(self) -> Result<ArrayRef> {
+            fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
                 Ok(Arc::new(<$array_type>::from(vec![self])) as ArrayRef)
             }
 
-            fn try_from_arrow(data: ArrayData) -> Result<Self>
+            fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
             where
                 Self: Sized,
             {
@@ -109,11 +111,11 @@ impl ArrowMessage for String {
         Field::new(name, DataType::Utf8, false)
     }
 
-    fn try_into_arrow(self) -> Result<ArrayRef> {
+    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
         Ok(Arc::new(StringArray::from(vec![self])) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> Result<Self>
+    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
     where
         Self: Sized,
     {
@@ -132,11 +134,11 @@ impl ArrowMessage for StringArray {
         Field::new(name, DataType::Utf8, false)
     }
 
-    fn try_into_arrow(self) -> Result<ArrayRef> {
+    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
         Ok(Arc::new(self) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> Result<Self>
+    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
     where
         Self: Sized,
     {

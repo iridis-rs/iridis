@@ -6,7 +6,6 @@ members = [
     "crates/flarrow-layout",
     "crates/flarrow-message",
     "crates/flarrow-message-derive",
-    "crates/flarrow-message-python",
     "crates/flarrow-runtime",
     "crates/flarrow-runtime-plan",
     "crates/flarrow-url",
@@ -29,15 +28,25 @@ version = "0.1.0"
 
 [workspace.dependencies]
 url = "2"
-pyo3 = "0.23"
-serde = "1.0"
 eyre = "0.6"
 uhlc = "0.8"
+
+serde = "1.0"
 serde_yml = "0.0.12"
+
 libloading = "0.8"
 
+proc-macro2 = "1"
+quote = "1"
+syn = "2"
+
+arrow-data = "54"
+arrow-schema = "54"
+arrow-array = "54"
+arrow-buffer = "54"
+
 uuid = { version = "1", features = ["v4", "v3"] }
-arrow = { version = "54", default-features = false }
+
 tokio = { version = "1", features = [
     "macros",
     "rt-multi-thread",
@@ -46,6 +55,7 @@ tokio = { version = "1", features = [
     "signal",
     "fs",
 ] }
+
 reqwest = { version = "0.12", default-features = false, features = [
     "rustls-tls",
     "charset",
@@ -63,4 +73,3 @@ flarrow-url = { version = "0.1.0", path = "crates/flarrow-url" }
 
 flarrow-message = { version = "0.1.0", path = "crates/flarrow-message" }
 flarrow-message-derive = { version = "0.1.0", path = "crates/flarrow-message-derive" }
-flarrow-message-python = { version = "0.1.0", path = "crates/flarrow-message-python" }

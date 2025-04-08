@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use arrow::array::*;
+    use arrow_array::*;
+    use arrow_data::*;
     use flarrow_message::prelude::*;
 
     #[test]

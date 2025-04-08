@@ -1,9 +1,8 @@
-use arrow::{
-    array::{ArrayData, BufferSpec},
-    buffer::{Buffer, MutableBuffer},
-    datatypes::DataType,
-    error::Result,
-};
+use arrow_buffer::{Buffer, MutableBuffer};
+use arrow_data::{ArrayData, BufferSpec};
+use arrow_schema::DataType;
+
+use crate::prelude::*;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -28,13 +27,13 @@ pub struct ArrayDataLayout {
 
 pub trait ArrayDataFlattening {
     fn layout_with_values(&self) -> (ArrayDataLayout, Buffer);
-    fn flattened(&self) -> Result<ArrayData>;
+    fn flattened(&self) -> ArrowResult<ArrayData>;
 
     fn layout(&self) -> ArrayDataLayout;
     fn required_size(&self) -> usize;
     fn fill(&self, target: &mut [u8]);
 
-    fn from_layout_and_values(layout: ArrayDataLayout, values: Buffer) -> Result<ArrayData>;
+    fn from_layout_and_values(layout: ArrayDataLayout, values: Buffer) -> ArrowResult<ArrayData>;
 }
 
 impl ArrayDataFlattening for ArrayData {
@@ -43,7 +42,7 @@ impl ArrayDataFlattening for ArrayData {
             let mut buffers = Vec::new();
             let mut child_data = Vec::new();
 
-            let layout = arrow::array::layout(array.data_type());
+            let layout = arrow_data::layout(array.data_type());
 
             for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
                 if let BufferSpec::FixedWidth { alignment, .. } = spec {
@@ -79,7 +78,7 @@ impl ArrayDataFlattening for ArrayData {
 
     fn required_size(&self) -> usize {
         fn required_size_inner(array: &ArrayData, next_offset: &mut usize) {
-            let layout = arrow::array::layout(array.data_type());
+            let layout = arrow_data::layout(array.data_type());
 
             for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
                 if let BufferSpec::FixedWidth { alignment, .. } = spec {
@@ -102,7 +101,7 @@ impl ArrayDataFlattening for ArrayData {
 
     fn fill(&self, target: &mut [u8]) {
         fn fill_inner(array: &ArrayData, next_offset: &mut usize, target: &mut [u8]) {
-            let layout = arrow::array::layout(array.data_type());
+            let layout = arrow_data::layout(array.data_type());
 
             for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
                 if let BufferSpec::FixedWidth { alignment, .. } = spec {
@@ -133,7 +132,7 @@ impl ArrayDataFlattening for ArrayData {
             let mut buffers = Vec::new();
             let mut child_data = Vec::new();
 
-            let layout = arrow::array::layout(array.data_type());
+            let layout = arrow_data::layout(array.data_type());
 
             for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
                 if let BufferSpec::FixedWidth { alignment, .. } = spec {
@@ -177,8 +176,8 @@ impl ArrayDataFlattening for ArrayData {
         (layout, data.into())
     }
 
-    fn from_layout_and_values(layout: ArrayDataLayout, values: Buffer) -> Result<ArrayData> {
-        fn inner(buffer: &Buffer, layout: ArrayDataLayout) -> Result<ArrayData> {
+    fn from_layout_and_values(layout: ArrayDataLayout, values: Buffer) -> ArrowResult<ArrayData> {
+        fn inner(buffer: &Buffer, layout: ArrayDataLayout) -> ArrowResult<ArrayData> {
             if buffer.is_empty() {
                 return Ok(ArrayData::new_empty(&layout.data_type));
             }
@@ -197,7 +196,7 @@ impl ArrayDataFlattening for ArrayData {
             ArrayData::try_new(
                 layout.data_type,
                 layout.len,
-                layout.null_bit_buffer.map(arrow::buffer::Buffer::from_vec),
+                layout.null_bit_buffer.map(Buffer::from_vec),
                 layout.offset,
                 buffers,
                 child_data,
@@ -207,7 +206,7 @@ impl ArrayDataFlattening for ArrayData {
         inner(&values, layout)
     }
 
-    fn flattened(&self) -> Result<ArrayData> {
+    fn flattened(&self) -> ArrowResult<ArrayData> {
         let (layout, values) = self.layout_with_values();
 
         Self::from_layout_and_values(layout, values)
