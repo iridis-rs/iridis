@@ -7,6 +7,7 @@ use url::Url;
 use crate::prelude::*;
 
 pub trait UrlPlugin: Send {
+    #[allow(clippy::new_ret_no_self)]
     fn new() -> JoinHandle<Result<Box<dyn UrlPlugin>>>
     where
         Self: Sized;

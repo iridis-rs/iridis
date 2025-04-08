@@ -7,10 +7,10 @@ static TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
         tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime")
     });
 
-fn runtime_spawn<T: Send + 'static>(
+fn default_runtime<T: Send + 'static>(
     task: impl Future<Output = T> + Send + 'static,
 ) -> tokio::task::JoinHandle<T> {
-    match Handle::try_current() {
+    match tokio::runtime::Handle::try_current() {
         Ok(handle) => handle.spawn(task),
         Err(_) => TOKIO_RUNTIME.spawn(task),
     }
@@ -21,7 +21,7 @@ pub struct Timer {
     pub frequency: f64,
 }
 
-#[node(runtime = "runtime_spawn")]
+#[node(runtime = "default_runtime")]
 impl Node for Timer {
     async fn new(
         _: Inputs,

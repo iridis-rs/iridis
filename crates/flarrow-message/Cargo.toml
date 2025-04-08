@@ -13,15 +13,10 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
-[features]
-serde = ["dep:serde"]
-
 [dependencies]
 arrow-data = { workspace = true }
 arrow-schema = { workspace = true }
 arrow-array = { workspace = true }
 arrow-buffer = { workspace = true }
-
-serde = { workspace = true, optional = true }
 
 flarrow-message-derive = { workspace = true }

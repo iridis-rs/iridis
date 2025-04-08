@@ -10,6 +10,8 @@ use url::Url;
 pub struct MyOperator {
     pub input: Input<String>,
     pub output: Output<String>,
+
+    counter: u32,
 }
 
 #[node(runtime = "default_runtime")]
@@ -25,15 +27,23 @@ impl Node for MyOperator {
         Ok(Box::new(Self {
             input: inputs.with("in").await?,
             output: outputs.with("out").await?,
+            counter: 0,
         }) as Box<dyn Node>)
     }
 
     async fn start(mut self: Box<Self>) -> eyre::Result<()> {
         while let Ok((_, message)) = self.input.recv_async().await {
+            self.counter += 1;
+
             self.output
-                .send(message)
+                .send(format!("{} - {}", self.counter, message))
                 .wrap_err("Failed to send message")?;
+
+            if self.counter >= 20 {
+                break;
+            }
         }
+
         Ok(())
     }
 }
@@ -68,11 +78,9 @@ async fn main() -> Result<()> {
 
     let runtime = DataflowRuntime::new(
         flows,
-        Arc::new(
-            RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
-                .await
-                .wrap_err("Failed to load URL plugin")?,
-        ),
+        RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
+            .await
+            .wrap_err("Failed to load URL plugin")?,
         async move |loader: &mut Loader| {
             loader
                 .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
@@ -83,7 +91,7 @@ async fn main() -> Result<()> {
             let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
 
             loader
-                .load_from_url(source, source_file, serde_yml::from_str("frequency: 2.0")?)
+                .load_from_url(source, source_file, serde_yml::from_str("frequency: 5.0")?)
                 .await
                 .wrap_err("Failed to load source")?;
             loader

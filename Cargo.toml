@@ -35,7 +35,6 @@ eyre = { version = "0.6", default-features = false, features = [
 url = { version = "2", default-features = false }
 uhlc = { version = "0.8", default-features = false }
 
-serde = "1.0"
 serde_yml = "0.0.12"
 
 libloading = "0.8"

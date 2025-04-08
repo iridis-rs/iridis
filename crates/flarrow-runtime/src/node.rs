@@ -6,14 +6,14 @@ use crate::prelude::*;
 
 pub struct Loader {
     pub flows: Flows,
-    pub url_plugin: Arc<RuntimeUrlPlugin>,
+    pub url_plugin: RuntimeUrlPlugin,
 
     pub clock: Arc<uhlc::HLC>,
     pub nodes: HashMap<NodeID, RuntimeNode>,
 }
 
 impl Loader {
-    pub fn new(flows: Flows, url_plugin: Arc<RuntimeUrlPlugin>, clock: Arc<uhlc::HLC>) -> Self {
+    pub fn new(flows: Flows, url_plugin: RuntimeUrlPlugin, clock: Arc<uhlc::HLC>) -> Self {
         Loader {
             flows,
             url_plugin,

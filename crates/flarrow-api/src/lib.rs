@@ -12,13 +12,8 @@ pub mod prelude {
 
     pub use flarrow_api_derive::{Node, node};
 
-    pub use std::sync::LazyLock;
-    pub use tokio::{
-        runtime::{Handle, Runtime},
-        task::JoinHandle,
-    };
-
     pub use serde_yml;
+    pub use tokio;
 
     pub use eyre::{Context, OptionExt, Result};
 }

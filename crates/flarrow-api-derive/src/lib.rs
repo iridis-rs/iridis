@@ -86,7 +86,7 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
                 };
 
                 method.sig.output = syn::parse_quote! {
-                    -> JoinHandle<#old_return_type>
+                    -> tokio::task::JoinHandle<#old_return_type>
                 };
 
                 method.block = syn::parse_quote! {

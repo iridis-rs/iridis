@@ -300,7 +300,6 @@ dependencies = [
  "arrow-data",
  "arrow-schema",
  "flarrow-message-derive",
- "serde",
 ]
 
 [[package]]

@@ -25,11 +25,6 @@ flarrow-layout = { workspace = true }
 flarrow-api-derive = { workspace = true }
 
 [[example]]
-name = "source"
-path = "examples/source.rs"
-crate-type = ["cdylib"]
-
-[[example]]
 name = "sink"
 path = "examples/sink.rs"
 crate-type = ["cdylib"]

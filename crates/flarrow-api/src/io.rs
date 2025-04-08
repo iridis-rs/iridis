@@ -7,46 +7,91 @@ use tokio::sync::{
 };
 
 use arrow_array::Array;
+use arrow_data::ArrayData;
 
 use crate::prelude::*;
 
-pub struct Output<T: ArrowMessage> {
+pub struct RawOutput {
     clock: Arc<uhlc::HLC>,
     tx: Sender<DataflowMessage>,
-
-    _phantom: std::marker::PhantomData<T>,
 }
 
-impl<T: ArrowMessage> Output<T> {
+impl RawOutput {
     pub fn new(clock: Arc<uhlc::HLC>, tx: Sender<DataflowMessage>) -> Self {
-        Self {
-            clock,
-            tx,
-            _phantom: std::marker::PhantomData,
-        }
+        Self { clock, tx }
     }
 
-    pub fn send(&self, data: T) -> eyre::Result<()> {
+    pub fn send(&self, data: ArrayData) -> eyre::Result<()> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
             },
-            data: data
-                .try_into_arrow()
-                .wrap_err("Failed to convert arrow 'data' to message T")?
-                .into_data(),
+            data,
         };
 
         self.tx
             .send(data)
             .map(|_| ())
             .map_err(eyre::Report::msg)
-            .wrap_err("Failed to send 'data'")
+            .wrap_err("Failed to send the message")
+    }
+}
+
+pub struct Output<T: ArrowMessage> {
+    raw: RawOutput,
+    _phantom: std::marker::PhantomData<T>,
+}
+
+impl<T: ArrowMessage> Output<T> {
+    pub fn new(clock: Arc<uhlc::HLC>, tx: Sender<DataflowMessage>) -> Self {
+        Self {
+            raw: RawOutput::new(clock, tx),
+            _phantom: std::marker::PhantomData,
+        }
+    }
+
+    pub fn send(&self, data: T) -> eyre::Result<()> {
+        self.raw.send(
+            data.try_into_arrow()
+                .wrap_err("Failed to convert arrow 'data' to message T")?
+                .into_data(),
+        )
+    }
+}
+
+pub struct RawInput {
+    rx: Receiver<DataflowMessage>,
+}
+
+impl RawInput {
+    pub fn new(rx: Receiver<DataflowMessage>) -> Self {
+        Self { rx }
+    }
+
+    pub fn recv(&mut self) -> eyre::Result<(Header, ArrayData)> {
+        let DataflowMessage { header, data } = self
+            .rx
+            .blocking_recv()
+            .map_err(eyre::Report::msg)
+            .wrap_err("Failed to receive from this input")?;
+
+        Ok((header, data))
+    }
+
+    pub async fn recv_async(&mut self) -> eyre::Result<(Header, ArrayData)> {
+        let DataflowMessage { header, data } = self
+            .rx
+            .recv()
+            .await
+            .map_err(eyre::Report::msg)
+            .wrap_err("Failed to receive from this input")?;
+
+        Ok((header, data))
     }
 }
 
 pub struct Input<T: ArrowMessage> {
-    rx: Receiver<DataflowMessage>,
+    raw: RawInput,
 
     _phantom: std::marker::PhantomData<T>,
 }
@@ -54,17 +99,13 @@ pub struct Input<T: ArrowMessage> {
 impl<T: ArrowMessage> Input<T> {
     pub fn new(rx: Receiver<DataflowMessage>) -> Self {
         Self {
-            rx,
+            raw: RawInput::new(rx),
             _phantom: std::marker::PhantomData,
         }
     }
 
     pub fn recv(&mut self) -> eyre::Result<(Header, T)> {
-        let DataflowMessage { header, data } = self
-            .rx
-            .blocking_recv()
-            .map_err(eyre::Report::msg)
-            .wrap_err("Failed to receive from this input")?;
+        let (header, data) = self.raw.recv()?;
 
         Ok((
             header,
@@ -73,12 +114,7 @@ impl<T: ArrowMessage> Input<T> {
     }
 
     pub async fn recv_async(&mut self) -> eyre::Result<(Header, T)> {
-        let DataflowMessage { header, data } = self
-            .rx
-            .recv()
-            .await
-            .map_err(eyre::Report::msg)
-            .wrap_err("Failed to receive from this input")?;
+        let (header, data) = self.raw.recv_async().await?;
 
         Ok((
             header,

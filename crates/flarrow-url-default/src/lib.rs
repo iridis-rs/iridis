@@ -25,7 +25,7 @@ fn default_runtime<T: Send + 'static>(
 pub struct UrlDefaultPlugin {}
 
 impl UrlPlugin for UrlDefaultPlugin {
-    fn new() -> JoinHandle<Result<Box<dyn UrlPlugin>>>
+    fn new() -> tokio::task::JoinHandle<Result<Box<dyn UrlPlugin>>>
     where
         Self: Sized,
     {
@@ -38,7 +38,7 @@ impl UrlPlugin for UrlDefaultPlugin {
         inputs: Inputs,
         outputs: Outputs,
         configuration: serde_yml::Value,
-    ) -> JoinHandle<Result<RuntimeNode>> {
+    ) -> tokio::task::JoinHandle<Result<RuntimeNode>> {
         default_runtime(async move {
             match url.scheme() {
                 "builtin" => {
