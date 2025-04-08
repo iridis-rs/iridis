@@ -5,7 +5,7 @@ pub struct MySource {
     pub output: Output<String>,
 }
 
-#[node(runtime = "runtime_spawn")]
+#[node(runtime = "default_runtime")]
 impl Node for MySource {
     async fn new(_: Inputs, mut outputs: Outputs, _: serde_yml::Value) -> Result<Box<dyn Node>>
     where

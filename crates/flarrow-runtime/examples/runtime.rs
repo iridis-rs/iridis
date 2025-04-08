@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
 use flarrow_runtime::prelude::*;
+
+use flarrow_url_default::UrlDefaultPlugin;
+
 use url::Url;
 
 #[derive(Node)]
@@ -9,7 +12,7 @@ pub struct MyOperator {
     pub output: Output<String>,
 }
 
-#[node(runtime = "runtime_spawn")]
+#[node(runtime = "default_runtime")]
 impl Node for MyOperator {
     async fn new(
         mut inputs: Inputs,
@@ -63,26 +66,34 @@ async fn main() -> Result<()> {
     let path = std::env::var("CARGO_MANIFEST_DIR")?;
     let examples = format!("file://{}/../../target/debug/examples", path);
 
-    let runtime = DataflowRuntime::new(flows, async move |loader: &mut Loader| {
-        loader
-            .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load MyOperator")?;
+    let runtime = DataflowRuntime::new(
+        flows,
+        Arc::new(
+            RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
+                .await
+                .wrap_err("Failed to load URL plugin")?,
+        ),
+        async move |loader: &mut Loader| {
+            loader
+                .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
+                .await
+                .wrap_err("Failed to load MyOperator")?;
 
-        let source_file = Url::parse("builtin:///timer")?;
-        let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
+            let source_file = Url::parse("builtin:///timer")?;
+            let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
 
-        loader
-            .load_from_url(source, source_file, serde_yml::from_str("frequency: 2.0")?)
-            .await
-            .wrap_err("Failed to load source")?;
-        loader
-            .load_from_url(sink, sink_file, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load sink")?;
+            loader
+                .load_from_url(source, source_file, serde_yml::from_str("frequency: 2.0")?)
+                .await
+                .wrap_err("Failed to load source")?;
+            loader
+                .load_from_url(sink, sink_file, serde_yml::Value::from(""))
+                .await
+                .wrap_err("Failed to load sink")?;
 
-        Ok(())
-    })
+            Ok(())
+        },
+    )
     .await?;
 
     runtime.run().await

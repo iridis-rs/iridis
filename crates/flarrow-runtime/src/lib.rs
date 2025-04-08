@@ -8,4 +8,5 @@ pub mod prelude {
     pub use crate::runtime::*;
 
     pub use flarrow_api::prelude::*;
+    pub use flarrow_url::prelude::*;
 }

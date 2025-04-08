@@ -5,7 +5,7 @@ pub struct MySink {
     pub input: Input<String>,
 }
 
-#[node(runtime = "runtime_spawn")]
+#[node(runtime = "default_runtime")]
 impl Node for MySink {
     async fn new(mut inputs: Inputs, _: Outputs, _: serde_yml::Value) -> Result<Box<dyn Node>>
     where

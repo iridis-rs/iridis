@@ -21,15 +21,15 @@ pub fn derive_node(input: TokenStream) -> TokenStream {
             <#name>::new(inputs, outputs, configuration)
         };
 
-        static TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
+        static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
             std::sync::LazyLock::new(|| tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime"));
 
-        fn runtime_spawn<T: Send + 'static>(
+        fn default_runtime<T: Send + 'static>(
             task: impl Future<Output = T> + Send + 'static,
         ) -> tokio::task::JoinHandle<T> {
-            match Handle::try_current() {
+            match tokio::runtime::Handle::try_current() {
                 Ok(handle) => handle.spawn(task),
-                Err(_) => TOKIO_RUNTIME.spawn(task)
+                Err(_) => DEFAULT_TOKIO_RUNTIME.spawn(task)
             }
         }
     };

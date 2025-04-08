@@ -15,9 +15,8 @@ version.workspace = true
 
 [dependencies]
 eyre = { workspace = true }
-tokio = { workspace = true }
-uuid = { workspace = true }
 url = { workspace = true }
-reqwest = { workspace = true }
+libloading = { workspace = true }
+tokio = { workspace = true }
 
-flarrow-builtins = { workspace = true }
+flarrow-api = { workspace = true }

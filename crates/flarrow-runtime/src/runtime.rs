@@ -4,16 +4,18 @@ use crate::prelude::*;
 
 pub struct DataflowRuntime {
     pub clock: Arc<uhlc::HLC>,
+
     pub nodes: HashMap<NodeID, RuntimeNode>,
 }
 
 impl DataflowRuntime {
     pub async fn new(
         flows: Flows,
+        url_plugin: Arc<RuntimeUrlPlugin>,
         load: impl AsyncFn(&mut Loader) -> Result<()>,
     ) -> eyre::Result<Self> {
         let clock = Arc::new(uhlc::HLC::default());
-        let mut loader = Loader::new(flows, clock.clone());
+        let mut loader = Loader::new(flows, url_plugin, clock.clone());
 
         load(&mut loader).await.wrap_err("Failed to load flows")?;
 
