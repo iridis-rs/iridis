@@ -1,3 +1,5 @@
+use arrow_data::ArrayData;
+
 use crate::prelude::*;
 
 use uhlc::Timestamp;

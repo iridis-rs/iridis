@@ -27,9 +27,12 @@ repository = "https://github.com/"
 version = "0.1.0"
 
 [workspace.dependencies]
-url = "2"
-eyre = "0.6"
-uhlc = "0.8"
+eyre = { version = "0.6", default-features = false, features = [
+    "auto-install",
+] }
+
+url = { version = "2", default-features = false }
+uhlc = { version = "0.8", default-features = false }
 
 serde = "1.0"
 serde_yml = "0.0.12"
@@ -45,7 +48,7 @@ arrow-schema = "54"
 arrow-array = "54"
 arrow-buffer = "54"
 
-uuid = { version = "1", features = ["v4", "v3"] }
+uuid = { version = "1", default-features = false, features = ["v4", "v3"] }
 
 tokio = { version = "1", features = [
     "macros",

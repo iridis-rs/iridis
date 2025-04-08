@@ -6,6 +6,8 @@ use tokio::sync::{
     broadcast::{Receiver, Sender},
 };
 
+use arrow_array::Array;
+
 use crate::prelude::*;
 
 pub struct Output<T: ArrowMessage> {
