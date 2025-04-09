@@ -4,8 +4,9 @@ Flarrow (flow + arrow) is a rust runtime/framework for building dataflow applica
 
 # Features
 
-- Async tokio runtime everywhere so you can easily use your async code.
--
+- Async tokio runtime everywhere so you can easily use your async code to determine the layout of your application.
+- Message passing between nodes with tokio channels.
+- Message passing without copy thanks to the Apache `arrow` format.
 
 # How it works
 
@@ -98,11 +99,7 @@ let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
 
 let runtime = DataflowRuntime::new(
     flows,
-    Some(
-        RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
-            .await
-            .wrap_err("Failed to load URL plugin")?,
-    ),
+    None, // will use the default one
     async move |loader: &mut Loader| {
         loader
             .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
