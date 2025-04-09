@@ -7,3 +7,5 @@
   - [Usage](./usage.md)
 
 - [Examples](./examples.md)
+
+- [`flarrow-rs`](./organization.md)
