@@ -15,6 +15,7 @@ pub fn derive_node(input: TokenStream) -> TokenStream {
     let name = input.ident;
 
     let expanded = quote! {
+        #[cfg(not(feature = "no-dylib"))]
         #[doc(hidden)]
         #[unsafe(no_mangle)]
         pub static FLARROW_NODE: DynamicallyLinkedNodeInstance = |inputs, outputs, configuration| {

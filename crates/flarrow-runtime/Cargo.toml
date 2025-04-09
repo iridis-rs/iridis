@@ -13,6 +13,9 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[features]
+no-dylib = []
+
 [dependencies]
 eyre = { workspace = true }
 tokio = { workspace = true }
