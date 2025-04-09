@@ -15,7 +15,15 @@ impl DataflowRuntime {
         load: impl AsyncFn(&mut Loader) -> Result<()>,
     ) -> eyre::Result<Self> {
         let clock = Arc::new(uhlc::HLC::default());
-        let mut loader = Loader::new(flows, url_plugin, clock.clone());
+        let mut loader = Loader::new(
+            flows,
+            url_plugin.unwrap_or(
+                RuntimeUrlPlugin::new_statically_linked::<UrlDefaultPlugin>()
+                    .await
+                    .wrap_err("Failed to load URL plugin")?,
+            ),
+            clock.clone(),
+        );
 
         load(&mut loader).await.wrap_err("Failed to load flows")?;
 

@@ -15,5 +15,5 @@ pub mod prelude {
     pub use serde_yml;
     pub use tokio;
 
-    pub use eyre::{Context, OptionExt, Result};
+    pub use eyre::{self, Context, OptionExt, Result};
 }

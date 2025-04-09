@@ -23,5 +23,4 @@ libloading = { workspace = true }
 flarrow-url = { workspace = true }
 flarrow-api = { workspace = true }
 
-[dev-dependencies]
 flarrow-url-default = { workspace = true }

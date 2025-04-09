@@ -9,4 +9,6 @@ pub mod prelude {
 
     pub use flarrow_api::prelude::*;
     pub use flarrow_url::prelude::*;
+
+    pub use flarrow_url_default::UrlDefaultPlugin;
 }

@@ -6,14 +6,14 @@ use crate::prelude::*;
 
 pub struct Loader {
     pub flows: Flows,
-    pub url_plugin: Option<RuntimeUrlPlugin>,
+    pub url_plugin: RuntimeUrlPlugin,
 
     pub clock: Arc<uhlc::HLC>,
     pub nodes: HashMap<NodeID, RuntimeNode>,
 }
 
 impl Loader {
-    pub fn new(flows: Flows, url_plugin: Option<RuntimeUrlPlugin>, clock: Arc<uhlc::HLC>) -> Self {
+    pub fn new(flows: Flows, url_plugin: RuntimeUrlPlugin, clock: Arc<uhlc::HLC>) -> Self {
         Loader {
             flows,
             url_plugin,
@@ -54,8 +54,6 @@ impl Loader {
 
         let handle = self
             .url_plugin
-            .as_ref()
-            .ok_or_eyre("URL plugin not available")?
             .load(url.clone(), inputs, outputs, configuration)
             .await
             .wrap_err(format!("Failed to await node from URL: {}", url))?
