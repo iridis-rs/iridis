@@ -326,10 +326,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "flarrow-runtime-plan"
-version = "0.1.1"
-
-[[package]]
 name = "flarrow-url"
 version = "0.1.1"
 dependencies = [

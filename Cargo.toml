@@ -7,7 +7,6 @@ members = [
     "crates/flarrow-message",
     "crates/flarrow-message-derive",
     "crates/flarrow-runtime",
-    "crates/flarrow-runtime-plan",
     "crates/flarrow-url",
     "crates/flarrow-url-default",
 ]
@@ -63,7 +62,6 @@ flarrow-layout = { version = "0.1.1", path = "crates/flarrow-layout" }
 flarrow-api = { version = "0.1.1", path = "crates/flarrow-api" }
 flarrow-api-derive = { version = "0.1.1", path = "crates/flarrow-api-derive" }
 flarrow-runtime = { version = "0.1.1", path = "crates/flarrow-runtime" }
-flarrow-runtime-plan = { version = "0.1.1", path = "crates/flarrow-runtime-plan" }
 flarrow-builtins = { version = "0.1.1", path = "crates/flarrow-builtins" }
 flarrow-url = { version = "0.1.1", path = "crates/flarrow-url" }
 flarrow-url-default = { version = "0.1.1", path = "crates/flarrow-url-default" }
