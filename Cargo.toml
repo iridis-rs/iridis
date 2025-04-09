@@ -24,7 +24,7 @@ categories = []
 documentation = "https://github.com/flarrow/flarrow-rs"
 license = "Apache-2.0"
 repository = "https://github.com/flarrow/flarrow-rs"
-version = "0.2.1"
+version = "0.2.2"
 
 [workspace.dependencies]
 eyre = { version = "0.6", default-features = false, features = [
@@ -58,16 +58,16 @@ tokio = { version = "1", features = [
     "fs",
 ] }
 
-flarrow-layout = { version = "0.2.1", path = "crates/flarrow-layout" }
-flarrow-api = { version = "0.2.1", path = "crates/flarrow-api" }
-flarrow-api-derive = { version = "0.2.1", path = "crates/flarrow-api-derive" }
-flarrow-runtime = { version = "0.2.1", path = "crates/flarrow-runtime" }
-flarrow-builtins = { version = "0.2.1", path = "crates/flarrow-builtins" }
-flarrow-url = { version = "0.2.1", path = "crates/flarrow-url" }
-flarrow-url-default = { version = "0.2.1", path = "crates/flarrow-url-default" }
+flarrow-layout = { version = "0.2.2", path = "crates/flarrow-layout" }
+flarrow-api = { version = "0.2.2", path = "crates/flarrow-api" }
+flarrow-api-derive = { version = "0.2.2", path = "crates/flarrow-api-derive" }
+flarrow-runtime = { version = "0.2.2", path = "crates/flarrow-runtime" }
+flarrow-builtins = { version = "0.2.2", path = "crates/flarrow-builtins" }
+flarrow-url = { version = "0.2.2", path = "crates/flarrow-url" }
+flarrow-url-default = { version = "0.2.2", path = "crates/flarrow-url-default" }
 
-flarrow-message = { version = "0.2.1", path = "crates/flarrow-message" }
-flarrow-message-derive = { version = "0.2.1", path = "crates/flarrow-message-derive" }
+flarrow-message = { version = "0.2.2", path = "crates/flarrow-message" }
+flarrow-message-derive = { version = "0.2.2", path = "crates/flarrow-message-derive" }
 
 [workspace.metadata.release]
 rate-limit.new-packages = 10
