@@ -13,7 +13,8 @@ use crate::prelude::*;
 
 pub struct RawOutput {
     clock: Arc<uhlc::HLC>,
-    tx: Sender<DataflowMessage>,
+
+    pub tx: Sender<DataflowMessage>,
 }
 
 impl RawOutput {
@@ -38,7 +39,8 @@ impl RawOutput {
 }
 
 pub struct Output<T: ArrowMessage> {
-    raw: RawOutput,
+    pub raw: RawOutput,
+
     _phantom: std::marker::PhantomData<T>,
 }
 
@@ -60,7 +62,7 @@ impl<T: ArrowMessage> Output<T> {
 }
 
 pub struct RawInput {
-    rx: Receiver<DataflowMessage>,
+    pub rx: Receiver<DataflowMessage>,
 }
 
 impl RawInput {
@@ -91,7 +93,7 @@ impl RawInput {
 }
 
 pub struct Input<T: ArrowMessage> {
-    raw: RawInput,
+    pub raw: RawInput,
 
     _phantom: std::marker::PhantomData<T>,
 }
@@ -136,6 +138,19 @@ impl Inputs {
         Self { node, receivers }
     }
 
+    pub async fn raw(&mut self, input: impl Into<String>) -> eyre::Result<RawInput> {
+        let id = self.node.input(input);
+
+        let receiver = self
+            .receivers
+            .lock()
+            .await
+            .remove(&id)
+            .ok_or_eyre(format!("Input {} not found", id.0))?;
+
+        Ok(RawInput::new(receiver))
+    }
+
     pub async fn with<T: ArrowMessage>(
         &mut self,
         input: impl Into<String>,
@@ -170,6 +185,19 @@ impl Outputs {
             clock,
             senders,
         }
+    }
+
+    pub async fn raw(&mut self, output: impl Into<String>) -> eyre::Result<RawOutput> {
+        let id = self.node.output(output);
+
+        let sender = self
+            .senders
+            .lock()
+            .await
+            .remove(&id)
+            .ok_or_eyre(format!("Output {} not found", id.0))?;
+
+        Ok(RawOutput::new(self.clock.clone(), sender))
     }
 
     pub async fn with<T: ArrowMessage>(
