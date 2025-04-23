@@ -28,9 +28,9 @@ pub struct Flows {
 impl Flows {
     pub async fn new(
         layout: Arc<DataflowLayout>,
-        flows: impl AsyncFnOnce(&mut Connector) -> Result<()>,
+        flows: impl AsyncFnOnce(&mut Builder) -> Result<()>,
     ) -> Result<Self> {
-        let mut connectors = Connector::new(layout)?;
+        let mut connectors = Builder::new(layout)?;
 
         flows(&mut connectors).await?;
 
@@ -45,7 +45,7 @@ impl Flows {
     }
 }
 
-pub struct Connector {
+pub struct Builder {
     layout: Arc<DataflowLayout>,
 
     senders: HashMap<OutputUUID, Vec<Sender<DataflowMessage>>>,
@@ -58,7 +58,7 @@ pub struct Connector {
     tmp_queryables_receivers_send: HashMap<QueryableUUID, Sender<DataflowMessage>>,
 }
 
-impl Connector {
+impl Builder {
     pub fn new(layout: Arc<DataflowLayout>) -> Result<Self> {
         Ok(Self {
             layout,

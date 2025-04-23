@@ -14,11 +14,8 @@ impl Node for MyService {
         _: Queries,
         mut queryables: Queryables,
         _: serde_yml::Value,
-    ) -> Result<Box<dyn Node>>
-    where
-        Self: Sized,
-    {
-        Ok(Box::new(Self {
+    ) -> Result<Self> {
+        Ok(Self {
             compare_to_128: queryables
                 .with("compare_to_128")
                 .await
@@ -27,7 +24,7 @@ impl Node for MyService {
                 .with("compare_to_64")
                 .await
                 .wrap_err("Failed to create compare_to_64 queryable")?,
-        }) as Box<dyn Node>)
+        })
     }
 
     async fn start(self: Box<Self>) -> Result<()> {

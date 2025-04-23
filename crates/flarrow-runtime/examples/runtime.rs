@@ -20,15 +20,12 @@ impl Node for MyOperator {
         _: Queries,
         _: Queryables,
         _: serde_yml::Value,
-    ) -> eyre::Result<Box<dyn Node>>
-    where
-        Self: Sized,
-    {
-        Ok(Box::new(Self {
+    ) -> eyre::Result<Self> {
+        Ok(Self {
             input: inputs.with("in").await?,
             output: outputs.with("out").await?,
             counter: 0,
-        }) as Box<dyn Node>)
+        })
     }
 
     async fn start(mut self: Box<Self>) -> eyre::Result<()> {
@@ -62,9 +59,9 @@ async fn main() -> Result<()> {
         .await;
 
     let layout = Arc::new(layout);
-    let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
-        connector.connect(op_in, output, None)?;
-        connector.connect(input, op_out, None)?;
+    let flows = Flows::new(layout.clone(), async move |builder: &mut Builder| {
+        builder.connect(op_in, output, None)?;
+        builder.connect(input, op_out, None)?;
 
         Ok(())
     })

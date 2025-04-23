@@ -83,20 +83,36 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
             if was_async {
                 let old_return_type = match &method.sig.output {
                     ReturnType::Default => quote! { () },
-                    ReturnType::Type(_, ty) => quote! { #ty },
+                    ReturnType::Type(_, ty) => {
+                        if method.sig.ident == "new" {
+                            quote! { Result<Box<dyn Node>> }
+                        } else {
+                            quote! { #ty }
+                        }
+                    }
                 };
 
                 method.sig.output = syn::parse_quote! {
                     -> tokio::task::JoinHandle<#old_return_type>
                 };
 
-                method.block = syn::parse_quote! {
-                    {
-                        #runtime_tokens(async move {
-                            #old_block
-                        })
-                    }
-                };
+                if method.sig.ident == "new" {
+                    method.block = syn::parse_quote! {
+                        {
+                            #runtime_tokens(async move {
+                                #old_block.map(|node| Box::new(node) as Box<dyn Node>)
+                            })
+                        }
+                    };
+                } else {
+                    method.block = syn::parse_quote! {
+                        {
+                            #runtime_tokens(async move {
+                                #old_block
+                            })
+                        }
+                    };
+                }
             } else {
                 panic!("Function is not async");
             }

@@ -17,11 +17,8 @@ impl Node for MyClient {
         mut queries: Queries,
         _: Queryables,
         _: serde_yml::Value,
-    ) -> Result<Box<dyn Node>>
-    where
-        Self: Sized,
-    {
-        Ok(Box::new(Self {
+    ) -> Result<Self> {
+        Ok(Self {
             ask_128: queries
                 .with("ask_128")
                 .await
@@ -30,7 +27,7 @@ impl Node for MyClient {
                 .with("ask_64")
                 .await
                 .wrap_err("Failed to create compare_to_64 queryable")?,
-        }) as Box<dyn Node>)
+        })
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
@@ -88,7 +85,7 @@ async fn main() -> Result<()> {
         .await;
 
     let layout = Arc::new(layout);
-    let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
+    let flows = Flows::new(layout.clone(), async move |connector: &mut Builder| {
         connector.service(ask_128, compare_to_128, None)?;
         connector.service(ask_64, compare_to_64, None)?;
 

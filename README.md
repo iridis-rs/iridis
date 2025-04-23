@@ -1,12 +1,14 @@
-# flarrow
+# `flarrow-runtime`
 
-Flarrow (flow + arrow) is a rust runtime/framework for building dataflow applications. It lets you define logical layouts for your application and then loading nodes into the runtime. Flarrow provides a simple and intuitive API for defining dataflow applications, making it easy to build complex systems with minimal effort.
+Flarrow (flow + arrow) is a rust framework for building dataflow applications. The `flarrow-runtime` repo defines crates that lets you define logical layouts for your application, load nodes into the runtime and execute it. Flarrow provides a simple and intuitive API for defining dataflow applications, making it easy to build complex systems with minimal effort.
 
 # Features
 
-- Async tokio runtime everywhere so you can easily use your async code to determine the layout of your application.
+- Async tokio runtime everywhere so you can easily use your async code to determine each step of the application.
 - Message passing between nodes with tokio channels.
 - Message passing without copy thanks to the Apache `arrow` format.
+- Service system with Query/Queryable primitive.
+- 100% pluggable!
 
 # How it works
 
@@ -49,13 +51,16 @@ pub struct MySink {
 
 #[node(runtime = "default_runtime")]
 impl Node for MySink {
-    async fn new(mut inputs: Inputs, _: Outputs, _: serde_yml::Value) -> Result<Box<dyn Node>>
-    where
-        Self: Sized,
-    {
-        Ok(Box::new(Self {
+    async fn new(
+        mut inputs: Inputs,
+        _: Outputs,
+        _: Queries,
+        _: Queryables,
+        _: serde_yml::Value,
+    ) -> Result<Self> {
+        Ok(Self {
             input: inputs.with("in").await.wrap_err("Failed to create input")?,
-        }) as Box<dyn Node>)
+        })
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
@@ -89,9 +94,9 @@ fn default_runtime<T: Send + 'static>(
 Now you've created a layout and implemented your nodes, you can create the connections between the nodes and load the implementation for each one. This is done by creating a `Flows` struct first, and then creating a `DataflowRuntime` instance. As you can see, the flows creation are defined in an `async` closure so you can use `async` code in it. You can also see that you can load the implementation for each node using the either `load_statically_linked` or `load_from_url`. The first one is intented to be used with `rlib` nodes, and the second one is intented to be used with `cdylib` or `builtin` nodes (which are `rlib` nodes already integrated into the runtime).
 
 ```rust
-let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
-    connector.connect(op_in, output)?;
-    connector.connect(input, op_out)?;
+let flows = Flows::new(layout.clone(), async move |builder: &mut Builder| {
+    builder.connect(op_in, output, None)?;
+    builder.connect(input, op_out, None)?;
 
     Ok(())
 })

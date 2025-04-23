@@ -29,19 +29,16 @@ impl Node for Timer {
         _: Queries,
         _: Queryables,
         configuration: serde_yml::Value,
-    ) -> eyre::Result<Box<dyn Node>>
-    where
-        Self: Sized,
-    {
+    ) -> Result<Self> {
         let frequency = match configuration.get("frequency") {
             Some(serde_yml::Value::Number(number)) => number.as_f64().unwrap_or(1.0),
             _ => 1.0,
         };
 
-        Ok(Box::new(Self {
+        Ok(Self {
             output: outputs.with("out").await?,
             frequency,
-        }) as Box<dyn Node>)
+        })
     }
 
     async fn start(self: Box<Self>) -> eyre::Result<()> {
