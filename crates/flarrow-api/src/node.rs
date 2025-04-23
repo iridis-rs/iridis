@@ -8,7 +8,13 @@ pub enum NodeResult {
 
 pub trait Node: Send + Sync {
     #[allow(clippy::new_ret_no_self)]
-    fn new(inputs: Inputs, outputs: Outputs, configuration: serde_yml::Value) -> NodeNewResult
+    fn new(
+        inputs: Inputs,
+        outputs: Outputs,
+        queries: Queries,
+        queryables: Queryables,
+        configuration: serde_yml::Value,
+    ) -> NodeNewResult
     where
         Self: Sized;
 
@@ -18,4 +24,5 @@ pub trait Node: Send + Sync {
 pub type NodeNewResult = JoinHandle<eyre::Result<Box<dyn Node>>>;
 pub type NodeStartResult = JoinHandle<eyre::Result<()>>;
 
-pub type DynamicallyLinkedNodeInstance = fn(Inputs, Outputs, serde_yml::Value) -> NodeNewResult;
+pub type DynamicallyLinkedNodeInstance =
+    fn(Inputs, Outputs, Queries, Queryables, serde_yml::Value) -> NodeNewResult;

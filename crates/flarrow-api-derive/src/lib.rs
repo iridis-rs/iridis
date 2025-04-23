@@ -15,11 +15,11 @@ pub fn derive_node(input: TokenStream) -> TokenStream {
     let name = input.ident;
 
     let expanded = quote! {
-        #[cfg(not(feature = "no-dylib"))]
+        #[cfg(feature = "cdylib")]
         #[doc(hidden)]
         #[unsafe(no_mangle)]
-        pub static FLARROW_NODE: DynamicallyLinkedNodeInstance = |inputs, outputs, configuration| {
-            <#name>::new(inputs, outputs, configuration)
+        pub static FLARROW_NODE: DynamicallyLinkedNodeInstance = |inputs, outputs, queries, queryables, configuration| {
+            <#name>::new(inputs, outputs, queries, queryables, configuration)
         };
 
         static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =

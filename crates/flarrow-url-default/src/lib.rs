@@ -37,6 +37,8 @@ impl UrlPlugin for UrlDefaultPlugin {
         url: url::Url,
         inputs: Inputs,
         outputs: Outputs,
+        queries: Queries,
+        queryables: Queryables,
         configuration: serde_yml::Value,
     ) -> tokio::task::JoinHandle<Result<RuntimeNode>> {
         default_runtime(async move {
@@ -48,7 +50,7 @@ impl UrlPlugin for UrlDefaultPlugin {
                         .wrap_err("Failed to parse builtin name")?;
 
                     Ok(RuntimeNode::StaticallyLinked(
-                        new_builtin(builtin, inputs, outputs, configuration)
+                        new_builtin(builtin, inputs, outputs, queries, queryables, configuration)
                             .await
                             .wrap_err("Failed to create builtin node")?,
                     ))
@@ -68,10 +70,16 @@ impl UrlPlugin for UrlDefaultPlugin {
 
                                 Ok(RuntimeNode::DynamicallyLinked(DynamicallyLinkedNode {
                                     _library: library,
-                                    handle: (constructor)(inputs, outputs, configuration)
-                                        .await
-                                        .wrap_err("Failed to await for dynamically linked node")?
-                                        .wrap_err("Failed to create dynamically linked node")?,
+                                    handle: (constructor)(
+                                        inputs,
+                                        outputs,
+                                        queries,
+                                        queryables,
+                                        configuration,
+                                    )
+                                    .await
+                                    .wrap_err("Failed to await for dynamically linked node")?
+                                    .wrap_err("Failed to create dynamically linked node")?,
                                 }))
                             } else {
                                 Err(eyre::eyre!("Unsupported file extension!"))

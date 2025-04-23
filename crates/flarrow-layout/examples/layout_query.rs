@@ -6,16 +6,12 @@ use flarrow_layout::prelude::*;
 async fn main() {
     let mut layout = DataflowLayout::new();
 
-    let (source, output) = layout
-        .create_node(async |io: &mut NodeIO| io.open_output("out"))
+    let (source, service) = layout
+        .create_node(async |io: &mut NodeIO| io.open_queryable("service"))
         .await;
 
-    let (operator, (op_in, op_out)) = layout
-        .create_node(async |io: &mut NodeIO| (io.open_input("in"), io.open_output("out")))
-        .await;
-
-    let (sink, input) = layout
-        .create_node(async |io: &mut NodeIO| io.open_input("in"))
+    let (sink, client) = layout
+        .create_node(async |io: &mut NodeIO| io.open_query("client"))
         .await;
 
     /// Convenient struct for printing the layout of this example
@@ -32,23 +28,16 @@ async fn main() {
         Node {
             _id: (String::from("source"), source),
             _inputs: HashSet::new(),
-            _outputs: HashSet::from([(String::from("out"), output)]),
-            _queryables: HashSet::new(),
-            _queries: HashSet::new(),
-        },
-        Node {
-            _id: (String::from("operator"), operator),
-            _inputs: HashSet::from([(String::from("in"), op_in)]),
-            _outputs: HashSet::from([(String::from("out"), op_out)]),
-            _queryables: HashSet::new(),
+            _outputs: HashSet::new(),
+            _queryables: HashSet::from([(String::from("service"), service)]),
             _queries: HashSet::new(),
         },
         Node {
             _id: (String::from("sink"), sink),
-            _inputs: HashSet::from([(String::from("in"), input)]),
+            _inputs: HashSet::new(),
             _outputs: HashSet::new(),
             _queryables: HashSet::new(),
-            _queries: HashSet::new(),
+            _queries: HashSet::from([(String::from("client"), client)]),
         },
     ];
 

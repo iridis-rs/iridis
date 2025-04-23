@@ -17,6 +17,8 @@ pub trait UrlPlugin: Send {
         url: Url,
         inputs: Inputs,
         outputs: Outputs,
+        queries: Queries,
+        queryables: Queryables,
         configuration: serde_yml::Value,
     ) -> JoinHandle<Result<RuntimeNode>>;
 }
@@ -67,14 +69,18 @@ impl RuntimeUrlPlugin {
         url: Url,
         inputs: Inputs,
         outputs: Outputs,
+        queries: Queries,
+        queryables: Queryables,
         configuration: serde_yml::Value,
     ) -> JoinHandle<Result<RuntimeNode>> {
         match self {
             RuntimeUrlPlugin::StaticallyLinked(plugin) => {
-                plugin.load(url, inputs, outputs, configuration)
+                plugin.load(url, inputs, outputs, queries, queryables, configuration)
             }
             RuntimeUrlPlugin::DynamicallyLinked(plugin) => {
-                plugin.handle.load(url, inputs, outputs, configuration)
+                plugin
+                    .handle
+                    .load(url, inputs, outputs, queries, queryables, configuration)
             }
         }
     }

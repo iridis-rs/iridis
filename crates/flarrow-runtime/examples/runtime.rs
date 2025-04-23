@@ -17,6 +17,8 @@ impl Node for MyOperator {
     async fn new(
         mut inputs: Inputs,
         mut outputs: Outputs,
+        _: Queries,
+        _: Queryables,
         _: serde_yml::Value,
     ) -> eyre::Result<Box<dyn Node>>
     where
@@ -34,7 +36,8 @@ impl Node for MyOperator {
             self.counter += 1;
 
             self.output
-                .send(format!("{} - {}", self.counter, message))
+                .send_async(format!("{} - {}", self.counter, message))
+                .await
                 .wrap_err("Failed to send message")?;
         }
 
@@ -60,8 +63,8 @@ async fn main() -> Result<()> {
 
     let layout = Arc::new(layout);
     let flows = Flows::new(layout.clone(), async move |connector: &mut Connector| {
-        connector.connect(op_in, output)?;
-        connector.connect(input, op_out)?;
+        connector.connect(op_in, output, None)?;
+        connector.connect(input, op_out, None)?;
 
         Ok(())
     })
