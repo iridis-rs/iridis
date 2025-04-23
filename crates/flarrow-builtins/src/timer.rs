@@ -41,7 +41,7 @@ impl Node for Timer {
         })
     }
 
-    async fn start(self: Box<Self>) -> eyre::Result<()> {
+    async fn start(self: Box<Self>) -> Result<()> {
         loop {
             tokio::time::sleep(Duration::from_millis((1000.0 / self.frequency) as u64)).await;
 

@@ -1,22 +1,19 @@
 use eyre::{Context, OptionExt};
-use std::{collections::HashMap, sync::Arc};
-
-use tokio::sync::{Mutex, mpsc::Receiver};
 
 use arrow_data::ArrayData;
 
 use crate::prelude::*;
 
 pub struct RawInput {
-    pub rx: Receiver<DataflowMessage>,
+    pub rx: DataflowReceiver,
 }
 
 impl RawInput {
-    pub fn new(rx: Receiver<DataflowMessage>) -> Self {
+    pub fn new(rx: DataflowReceiver) -> Self {
         Self { rx }
     }
 
-    pub fn recv(&mut self) -> eyre::Result<(Header, ArrayData)> {
+    pub fn recv(&mut self) -> Result<(Header, ArrayData)> {
         let DataflowMessage { header, data } = self
             .rx
             .blocking_recv()
@@ -25,7 +22,7 @@ impl RawInput {
         Ok((header, data))
     }
 
-    pub async fn recv_async(&mut self) -> eyre::Result<(Header, ArrayData)> {
+    pub async fn recv_async(&mut self) -> Result<(Header, ArrayData)> {
         let DataflowMessage { header, data } = self
             .rx
             .recv()
@@ -43,14 +40,14 @@ pub struct Input<T: ArrowMessage> {
 }
 
 impl<T: ArrowMessage> Input<T> {
-    pub fn new(rx: Receiver<DataflowMessage>) -> Self {
+    pub fn new(rx: DataflowReceiver) -> Self {
         Self {
             raw: RawInput::new(rx),
             _phantom: std::marker::PhantomData,
         }
     }
 
-    pub fn recv(&mut self) -> eyre::Result<(Header, T)> {
+    pub fn recv(&mut self) -> Result<(Header, T)> {
         let (header, data) = self.raw.recv()?;
 
         Ok((
@@ -59,7 +56,7 @@ impl<T: ArrowMessage> Input<T> {
         ))
     }
 
-    pub async fn recv_async(&mut self) -> eyre::Result<(Header, T)> {
+    pub async fn recv_async(&mut self) -> Result<(Header, T)> {
         let (header, data) = self.raw.recv_async().await?;
 
         Ok((
@@ -72,20 +69,15 @@ impl<T: ArrowMessage> Input<T> {
 pub struct Inputs {
     node: NodeUUID,
 
-    #[allow(clippy::type_complexity)]
-    receivers: Arc<Mutex<HashMap<InputUUID, Receiver<DataflowMessage>>>>,
+    receivers: SharedMap<InputUUID, DataflowReceiver>,
 }
 
 impl Inputs {
-    #[allow(clippy::type_complexity)]
-    pub fn new(
-        node: NodeUUID,
-        receivers: Arc<Mutex<HashMap<InputUUID, Receiver<DataflowMessage>>>>,
-    ) -> Self {
+    pub fn new(node: NodeUUID, receivers: SharedMap<InputUUID, DataflowReceiver>) -> Self {
         Self { node, receivers }
     }
 
-    pub async fn raw(&mut self, input: impl Into<String>) -> eyre::Result<RawInput> {
+    pub async fn raw(&mut self, input: impl Into<String>) -> Result<RawInput> {
         let id = self.node.input(input);
 
         let receiver = self
@@ -98,10 +90,7 @@ impl Inputs {
         Ok(RawInput::new(receiver))
     }
 
-    pub async fn with<T: ArrowMessage>(
-        &mut self,
-        input: impl Into<String>,
-    ) -> eyre::Result<Input<T>> {
+    pub async fn with<T: ArrowMessage>(&mut self, input: impl Into<String>) -> Result<Input<T>> {
         let id = self.node.input(input);
 
         let receiver = self

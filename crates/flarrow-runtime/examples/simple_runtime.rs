@@ -20,7 +20,7 @@ impl Node for MyOperator {
         _: Queries,
         _: Queryables,
         _: serde_yml::Value,
-    ) -> eyre::Result<Self> {
+    ) -> Result<Self> {
         Ok(Self {
             input: inputs.with("in").await?,
             output: outputs.with("out").await?,
@@ -28,7 +28,7 @@ impl Node for MyOperator {
         })
     }
 
-    async fn start(mut self: Box<Self>) -> eyre::Result<()> {
+    async fn start(mut self: Box<Self>) -> Result<()> {
         while let Ok((_, message)) = self.input.recv_async().await {
             self.counter += 1;
 

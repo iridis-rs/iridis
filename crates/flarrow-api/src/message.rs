@@ -1,4 +1,5 @@
 use arrow_data::ArrayData;
+use tokio::sync::mpsc::{Receiver, Sender};
 
 use crate::prelude::*;
 
@@ -24,3 +25,6 @@ pub struct DataflowMessage {
     pub header: Header,
     pub data: ArrayData,
 }
+
+pub type DataflowSender = Sender<DataflowMessage>;
+pub type DataflowReceiver = Receiver<DataflowMessage>;

@@ -1,28 +1,24 @@
 use std::{collections::HashMap, sync::Arc};
 
-use tokio::sync::{
-    Mutex,
-    mpsc::{Receiver, Sender},
-};
+use tokio::sync::Mutex;
 
 use crate::prelude::*;
 
 pub struct Flows {
     #[allow(clippy::type_complexity)]
-    pub senders: Arc<Mutex<HashMap<OutputUUID, Vec<Sender<DataflowMessage>>>>>,
+    pub senders: Arc<Mutex<HashMap<OutputUUID, Vec<DataflowSender>>>>,
     #[allow(clippy::type_complexity)]
-    pub receivers: Arc<Mutex<HashMap<InputUUID, Receiver<DataflowMessage>>>>,
+    pub receivers: Arc<Mutex<HashMap<InputUUID, DataflowReceiver>>>,
 
     #[allow(clippy::type_complexity)]
-    pub queries_senders: Arc<Mutex<HashMap<QueryUUID, Sender<DataflowMessage>>>>,
+    pub queries_senders: Arc<Mutex<HashMap<QueryUUID, DataflowSender>>>,
     #[allow(clippy::type_complexity)]
-    pub queries_receivers: Arc<Mutex<HashMap<QueryUUID, Receiver<DataflowMessage>>>>,
+    pub queries_receivers: Arc<Mutex<HashMap<QueryUUID, DataflowReceiver>>>,
 
     #[allow(clippy::type_complexity)]
-    pub queryables_senders:
-        Arc<Mutex<HashMap<QueryableUUID, HashMap<QueryUUID, Sender<DataflowMessage>>>>>,
+    pub queryables_senders: Arc<Mutex<HashMap<QueryableUUID, HashMap<QueryUUID, DataflowSender>>>>,
     #[allow(clippy::type_complexity)]
-    pub queryables_receivers: Arc<Mutex<HashMap<QueryableUUID, Receiver<DataflowMessage>>>>,
+    pub queryables_receivers: Arc<Mutex<HashMap<QueryableUUID, DataflowReceiver>>>,
 }
 
 impl Flows {
@@ -48,14 +44,14 @@ impl Flows {
 pub struct Builder {
     layout: Arc<DataflowLayout>,
 
-    senders: HashMap<OutputUUID, Vec<Sender<DataflowMessage>>>,
-    receivers: HashMap<InputUUID, Receiver<DataflowMessage>>,
-    queries_senders: HashMap<QueryUUID, Sender<DataflowMessage>>,
-    queries_receivers: HashMap<QueryUUID, Receiver<DataflowMessage>>,
+    senders: HashMap<OutputUUID, Vec<DataflowSender>>,
+    receivers: HashMap<InputUUID, DataflowReceiver>,
+    queries_senders: HashMap<QueryUUID, DataflowSender>,
+    queries_receivers: HashMap<QueryUUID, DataflowReceiver>,
 
-    queryables_senders: HashMap<QueryableUUID, HashMap<QueryUUID, Sender<DataflowMessage>>>,
-    queryables_receivers: HashMap<QueryableUUID, Receiver<DataflowMessage>>,
-    tmp_queryables_receivers_send: HashMap<QueryableUUID, Sender<DataflowMessage>>,
+    queryables_senders: HashMap<QueryableUUID, HashMap<QueryUUID, DataflowSender>>,
+    queryables_receivers: HashMap<QueryableUUID, DataflowReceiver>,
+    tmp_queryables_receivers_send: HashMap<QueryableUUID, DataflowSender>,
 }
 
 impl Builder {
@@ -77,7 +73,7 @@ impl Builder {
         query: QueryUUID,
         queryable: QueryableUUID,
         capacity: Option<usize>,
-    ) -> eyre::Result<&mut Self> {
+    ) -> Result<&mut Self> {
         if !self.layout.queryables.contains(&queryable) {
             eyre::bail!("Queryable ID {} not found", queryable.0);
         }
@@ -127,7 +123,7 @@ impl Builder {
         input: InputUUID,
         output: OutputUUID,
         capacity: Option<usize>,
-    ) -> eyre::Result<&mut Self> {
+    ) -> Result<&mut Self> {
         if !self.layout.inputs.contains(&input) {
             eyre::bail!("Input ID {} not found", input.0);
         }

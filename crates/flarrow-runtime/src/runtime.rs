@@ -13,7 +13,7 @@ impl DataflowRuntime {
         flows: Flows,
         url_plugin: Option<RuntimeUrlPlugin>,
         load: impl AsyncFnOnce(&mut Loader) -> Result<()>,
-    ) -> eyre::Result<Self> {
+    ) -> Result<Self> {
         let clock = Arc::new(uhlc::HLC::default());
         let mut loader = Loader::new(
             flows,

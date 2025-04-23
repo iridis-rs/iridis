@@ -1,10 +1,6 @@
-use eyre::{Context, OptionExt, bail};
 use std::{collections::HashMap, sync::Arc};
 
-use tokio::sync::{
-    Mutex,
-    mpsc::{Receiver, Sender},
-};
+use eyre::{Context, OptionExt, bail};
 
 use arrow_array::Array;
 use arrow_data::ArrayData;
@@ -14,23 +10,23 @@ use crate::prelude::*;
 pub struct RawQueryable {
     clock: Arc<uhlc::HLC>,
 
-    pub tx: HashMap<QueryUUID, Sender<DataflowMessage>>,
-    pub rx: Receiver<DataflowMessage>,
+    pub tx: HashMap<QueryUUID, DataflowSender>,
+    pub rx: DataflowReceiver,
 }
 
 impl RawQueryable {
     pub fn new(
         clock: Arc<uhlc::HLC>,
-        tx: HashMap<QueryUUID, Sender<DataflowMessage>>,
-        rx: Receiver<DataflowMessage>,
+        tx: HashMap<QueryUUID, DataflowSender>,
+        rx: DataflowReceiver,
     ) -> Self {
         Self { clock, tx, rx }
     }
 
     pub fn on_demand(
         &mut self,
-        response: impl FnOnce(DataflowMessage) -> eyre::Result<ArrayData>,
-    ) -> eyre::Result<()> {
+        response: impl FnOnce(DataflowMessage) -> Result<ArrayData>,
+    ) -> Result<()> {
         let message = self
             .rx
             .blocking_recv()
@@ -55,8 +51,8 @@ impl RawQueryable {
 
     pub async fn on_demand_async(
         &mut self,
-        response: impl AsyncFnOnce(DataflowMessage) -> eyre::Result<ArrayData>,
-    ) -> eyre::Result<()> {
+        response: impl AsyncFnOnce(DataflowMessage) -> Result<ArrayData>,
+    ) -> Result<()> {
         let message = self
             .rx
             .recv()
@@ -92,8 +88,8 @@ pub struct Queryable<T: ArrowMessage, F: ArrowMessage> {
 impl<T: ArrowMessage, F: ArrowMessage> Queryable<T, F> {
     pub fn new(
         clock: Arc<uhlc::HLC>,
-        tx: HashMap<QueryUUID, Sender<DataflowMessage>>,
-        rx: Receiver<DataflowMessage>,
+        tx: HashMap<QueryUUID, DataflowSender>,
+        rx: DataflowReceiver,
     ) -> Self {
         Self {
             raw: RawQueryable::new(clock, tx, rx),
@@ -101,7 +97,7 @@ impl<T: ArrowMessage, F: ArrowMessage> Queryable<T, F> {
         }
     }
 
-    pub fn on_demand(&mut self, response: impl FnOnce(T) -> eyre::Result<F>) -> eyre::Result<()> {
+    pub fn on_demand(&mut self, response: impl FnOnce(T) -> Result<F>) -> Result<()> {
         self.raw.on_demand(move |message| {
             let result = response(
                 T::try_from_arrow(message.data)
@@ -117,8 +113,8 @@ impl<T: ArrowMessage, F: ArrowMessage> Queryable<T, F> {
 
     pub async fn on_demand_async(
         &mut self,
-        response: impl AsyncFnOnce(T) -> eyre::Result<F>,
-    ) -> eyre::Result<()> {
+        response: impl AsyncFnOnce(T) -> Result<F>,
+    ) -> Result<()> {
         self.raw
             .on_demand_async(async move |message| {
                 let result = response(
@@ -141,19 +137,16 @@ pub struct Queryables {
 
     clock: Arc<uhlc::HLC>,
 
-    #[allow(clippy::type_complexity)]
-    senders: Arc<Mutex<HashMap<QueryableUUID, HashMap<QueryUUID, Sender<DataflowMessage>>>>>,
-    #[allow(clippy::type_complexity)]
-    receivers: Arc<Mutex<HashMap<QueryableUUID, Receiver<DataflowMessage>>>>,
+    senders: SharedMap<QueryableUUID, HashMap<QueryUUID, DataflowSender>>,
+    receivers: SharedMap<QueryableUUID, DataflowReceiver>,
 }
 
 impl Queryables {
-    #[allow(clippy::type_complexity)]
     pub fn new(
         node: NodeUUID,
         clock: Arc<uhlc::HLC>,
-        senders: Arc<Mutex<HashMap<QueryableUUID, HashMap<QueryUUID, Sender<DataflowMessage>>>>>,
-        receivers: Arc<Mutex<HashMap<QueryableUUID, Receiver<DataflowMessage>>>>,
+        senders: SharedMap<QueryableUUID, HashMap<QueryUUID, DataflowSender>>,
+        receivers: SharedMap<QueryableUUID, DataflowReceiver>,
     ) -> Self {
         Self {
             node,
@@ -163,7 +156,7 @@ impl Queryables {
         }
     }
 
-    pub async fn raw(&mut self, queryable: impl Into<String>) -> eyre::Result<RawQueryable> {
+    pub async fn raw(&mut self, queryable: impl Into<String>) -> Result<RawQueryable> {
         let id = self.node.queryable(queryable);
 
         let sender = self
@@ -186,7 +179,7 @@ impl Queryables {
     pub async fn with<T: ArrowMessage, F: ArrowMessage>(
         &mut self,
         queryable: impl Into<String>,
-    ) -> eyre::Result<Queryable<T, F>> {
+    ) -> Result<Queryable<T, F>> {
         let id = self.node.queryable(queryable);
 
         let sender = self

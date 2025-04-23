@@ -29,32 +29,26 @@ impl Node for MyService {
 
     async fn start(self: Box<Self>) -> Result<()> {
         let mut compare_to_128 = self.compare_to_128;
-        let task_128 = tokio::spawn(async move {
+        let task_128: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
             loop {
-                if let Err(e) = compare_to_128
+                compare_to_128
                     .on_demand_async(async |query| match query > 128 {
                         true => Ok("Greater than 128".to_string()),
                         false => Ok("Less than or equal to 128".to_string()),
                     })
-                    .await
-                {
-                    return Err(e);
-                }
+                    .await?;
             }
         });
 
         let mut compare_to_64 = self.compare_to_64;
-        let task_64 = tokio::spawn(async move {
+        let task_64: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
             loop {
-                if let Err(e) = compare_to_64
+                compare_to_64
                     .on_demand_async(async |query| match query > 64 {
                         true => Ok("Greater than 64".to_string()),
                         false => Ok("Less than or equal to 64".to_string()),
                     })
-                    .await
-                {
-                    return Err(e);
-                }
+                    .await?
             }
         });
 

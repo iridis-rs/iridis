@@ -1,7 +1,5 @@
 use eyre::{Context, OptionExt, eyre};
-use std::{collections::HashMap, sync::Arc};
-
-use tokio::sync::{Mutex, mpsc::Sender};
+use std::sync::Arc;
 
 use arrow_array::Array;
 use arrow_data::ArrayData;
@@ -11,15 +9,15 @@ use crate::prelude::*;
 pub struct RawOutput {
     clock: Arc<uhlc::HLC>,
 
-    pub tx: Vec<Sender<DataflowMessage>>,
+    pub tx: Vec<DataflowSender>,
 }
 
 impl RawOutput {
-    pub fn new(clock: Arc<uhlc::HLC>, tx: Vec<Sender<DataflowMessage>>) -> Self {
+    pub fn new(clock: Arc<uhlc::HLC>, tx: Vec<DataflowSender>) -> Self {
         Self { clock, tx }
     }
 
-    pub fn send(&self, data: ArrayData) -> eyre::Result<()> {
+    pub fn send(&self, data: ArrayData) -> Result<()> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
@@ -53,7 +51,7 @@ impl RawOutput {
         }
     }
 
-    pub async fn send_async(&self, data: ArrayData) -> eyre::Result<()> {
+    pub async fn send_async(&self, data: ArrayData) -> Result<()> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
@@ -107,14 +105,14 @@ pub struct Output<T: ArrowMessage> {
 }
 
 impl<T: ArrowMessage> Output<T> {
-    pub fn new(clock: Arc<uhlc::HLC>, tx: Vec<Sender<DataflowMessage>>) -> Self {
+    pub fn new(clock: Arc<uhlc::HLC>, tx: Vec<DataflowSender>) -> Self {
         Self {
             raw: RawOutput::new(clock, tx),
             _phantom: std::marker::PhantomData,
         }
     }
 
-    pub fn send(&self, data: T) -> eyre::Result<()> {
+    pub fn send(&self, data: T) -> Result<()> {
         self.raw.send(
             data.try_into_arrow()
                 .wrap_err("Failed to convert arrow 'data' to message T")?
@@ -122,7 +120,7 @@ impl<T: ArrowMessage> Output<T> {
         )
     }
 
-    pub async fn send_async(&self, data: T) -> eyre::Result<()> {
+    pub async fn send_async(&self, data: T) -> Result<()> {
         self.raw
             .send_async(
                 data.try_into_arrow()
@@ -136,8 +134,7 @@ impl<T: ArrowMessage> Output<T> {
 pub struct Outputs {
     node: NodeUUID,
     clock: Arc<uhlc::HLC>,
-    #[allow(clippy::type_complexity)]
-    senders: Arc<Mutex<HashMap<OutputUUID, Vec<Sender<DataflowMessage>>>>>,
+    senders: SharedMap<OutputUUID, Vec<DataflowSender>>,
 }
 
 impl Outputs {
@@ -145,7 +142,7 @@ impl Outputs {
     pub fn new(
         node: NodeUUID,
         clock: Arc<uhlc::HLC>,
-        senders: Arc<Mutex<HashMap<OutputUUID, Vec<Sender<DataflowMessage>>>>>,
+        senders: SharedMap<OutputUUID, Vec<DataflowSender>>,
     ) -> Self {
         Self {
             node,
@@ -154,7 +151,7 @@ impl Outputs {
         }
     }
 
-    pub async fn raw(&mut self, output: impl Into<String>) -> eyre::Result<RawOutput> {
+    pub async fn raw(&mut self, output: impl Into<String>) -> Result<RawOutput> {
         let id = self.node.output(output);
 
         let sender = self
@@ -167,10 +164,7 @@ impl Outputs {
         Ok(RawOutput::new(self.clock.clone(), sender))
     }
 
-    pub async fn with<T: ArrowMessage>(
-        &mut self,
-        output: impl Into<String>,
-    ) -> eyre::Result<Output<T>> {
+    pub async fn with<T: ArrowMessage>(&mut self, output: impl Into<String>) -> Result<Output<T>> {
         let id = self.node.output(output);
 
         let sender = self

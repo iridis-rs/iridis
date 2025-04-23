@@ -1,10 +1,5 @@
 use eyre::{Context, OptionExt};
-use std::{collections::HashMap, sync::Arc};
-
-use tokio::sync::{
-    Mutex,
-    mpsc::{Receiver, Sender},
-};
+use std::sync::Arc;
 
 use arrow_array::Array;
 use arrow_data::ArrayData;
@@ -15,16 +10,16 @@ pub struct RawQuery {
     clock: Arc<uhlc::HLC>,
     uuid: QueryUUID,
 
-    pub tx: Sender<DataflowMessage>,
-    pub rx: Receiver<DataflowMessage>,
+    pub tx: DataflowSender,
+    pub rx: DataflowReceiver,
 }
 
 impl RawQuery {
     pub fn new(
         clock: Arc<uhlc::HLC>,
         uuid: QueryUUID,
-        tx: Sender<DataflowMessage>,
-        rx: Receiver<DataflowMessage>,
+        tx: DataflowSender,
+        rx: DataflowReceiver,
     ) -> Self {
         Self {
             tx,
@@ -34,7 +29,7 @@ impl RawQuery {
         }
     }
 
-    pub fn query(&mut self, data: ArrayData) -> eyre::Result<(Header, ArrayData)> {
+    pub fn query(&mut self, data: ArrayData) -> Result<(Header, ArrayData)> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
@@ -56,7 +51,7 @@ impl RawQuery {
         Ok((header, data))
     }
 
-    pub async fn query_async(&mut self, data: ArrayData) -> eyre::Result<(Header, ArrayData)> {
+    pub async fn query_async(&mut self, data: ArrayData) -> Result<(Header, ArrayData)> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
@@ -91,8 +86,8 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
     pub fn new(
         clock: Arc<uhlc::HLC>,
         uuid: QueryUUID,
-        tx: Sender<DataflowMessage>,
-        rx: Receiver<DataflowMessage>,
+        tx: DataflowSender,
+        rx: DataflowReceiver,
     ) -> Self {
         Self {
             raw: RawQuery::new(clock, uuid, tx, rx),
@@ -100,7 +95,7 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
         }
     }
 
-    pub fn query(&mut self, data: T) -> eyre::Result<(Header, F)> {
+    pub fn query(&mut self, data: T) -> Result<(Header, F)> {
         let (header, data) = self.raw.query(
             data.try_into_arrow()
                 .wrap_err("Failed to convert arrow 'data' to message T")?
@@ -113,7 +108,7 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
         ))
     }
 
-    pub async fn query_async(&mut self, data: T) -> eyre::Result<(Header, F)> {
+    pub async fn query_async(&mut self, data: T) -> Result<(Header, F)> {
         let (header, data) = self
             .raw
             .query_async(
@@ -135,19 +130,16 @@ pub struct Queries {
 
     clock: Arc<uhlc::HLC>,
 
-    #[allow(clippy::type_complexity)]
-    senders: Arc<Mutex<HashMap<QueryUUID, Sender<DataflowMessage>>>>,
-    #[allow(clippy::type_complexity)]
-    receivers: Arc<Mutex<HashMap<QueryUUID, Receiver<DataflowMessage>>>>,
+    senders: SharedMap<QueryUUID, DataflowSender>,
+    receivers: SharedMap<QueryUUID, DataflowReceiver>,
 }
 
 impl Queries {
-    #[allow(clippy::type_complexity)]
     pub fn new(
         node: NodeUUID,
         clock: Arc<uhlc::HLC>,
-        senders: Arc<Mutex<HashMap<QueryUUID, Sender<DataflowMessage>>>>,
-        receivers: Arc<Mutex<HashMap<QueryUUID, Receiver<DataflowMessage>>>>,
+        senders: SharedMap<QueryUUID, DataflowSender>,
+        receivers: SharedMap<QueryUUID, DataflowReceiver>,
     ) -> Self {
         Self {
             node,
@@ -157,7 +149,7 @@ impl Queries {
         }
     }
 
-    pub async fn raw(&mut self, query: impl Into<String>) -> eyre::Result<RawQuery> {
+    pub async fn raw(&mut self, query: impl Into<String>) -> Result<RawQuery> {
         let id = self.node.query(query);
 
         let sender = self
@@ -180,7 +172,7 @@ impl Queries {
     pub async fn with<T: ArrowMessage, F: ArrowMessage>(
         &mut self,
         query: impl Into<String>,
-    ) -> eyre::Result<Query<T, F>> {
+    ) -> Result<Query<T, F>> {
         let id = self.node.query(query);
 
         let sender = self

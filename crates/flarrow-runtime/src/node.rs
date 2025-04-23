@@ -26,7 +26,7 @@ impl Loader {
         &mut self,
         node: NodeUUID,
         configuration: serde_yml::Value,
-    ) -> eyre::Result<()> {
+    ) -> Result<()> {
         let inputs = Inputs::new(node, self.flows.receivers.clone());
         let outputs = Outputs::new(node, self.clock.clone(), self.flows.senders.clone());
         let queries = Queries::new(
@@ -60,7 +60,7 @@ impl Loader {
         node: NodeUUID,
         url: Url,
         configuration: serde_yml::Value,
-    ) -> eyre::Result<()> {
+    ) -> Result<()> {
         let inputs = Inputs::new(node, self.flows.receivers.clone());
         let outputs = Outputs::new(node, self.clock.clone(), self.flows.senders.clone());
         let queries = Queries::new(
