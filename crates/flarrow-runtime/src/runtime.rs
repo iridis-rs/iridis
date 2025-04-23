@@ -5,14 +5,14 @@ use crate::prelude::*;
 pub struct DataflowRuntime {
     pub clock: Arc<uhlc::HLC>,
 
-    pub nodes: HashMap<NodeID, RuntimeNode>,
+    pub nodes: HashMap<NodeUUID, RuntimeNode>,
 }
 
 impl DataflowRuntime {
     pub async fn new(
         flows: Flows,
         url_plugin: Option<RuntimeUrlPlugin>,
-        load: impl AsyncFn(&mut Loader) -> Result<()>,
+        load: impl AsyncFnOnce(&mut Loader) -> Result<()>,
     ) -> eyre::Result<Self> {
         let clock = Arc::new(uhlc::HLC::default());
         let mut loader = Loader::new(

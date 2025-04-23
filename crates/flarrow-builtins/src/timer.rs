@@ -26,6 +26,8 @@ impl Node for Timer {
     async fn new(
         _: Inputs,
         mut outputs: Outputs,
+        _: Queries,
+        _: Queryables,
         configuration: serde_yml::Value,
     ) -> eyre::Result<Box<dyn Node>>
     where
@@ -47,7 +49,8 @@ impl Node for Timer {
             tokio::time::sleep(Duration::from_millis((1000.0 / self.frequency) as u64)).await;
 
             self.output
-                .send("tick".to_string())
+                .send_async("tick".to_string())
+                .await
                 .wrap_err("Failed to send message")?;
         }
     }

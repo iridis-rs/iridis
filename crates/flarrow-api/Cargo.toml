@@ -14,7 +14,7 @@ repository.workspace = true
 version.workspace = true
 
 [features]
-no-dylib = []
+cdylib = []
 
 [dependencies]
 eyre = { workspace = true }
@@ -30,4 +30,9 @@ flarrow-api-derive = { workspace = true }
 [[example]]
 name = "sink"
 path = "examples/sink.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "service"
+path = "examples/service.rs"
 crate-type = ["cdylib"]
