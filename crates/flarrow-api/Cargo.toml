@@ -21,6 +21,11 @@ eyre = { workspace = true }
 tokio = { workspace = true }
 uhlc = { workspace = true }
 serde_yml = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+
+arrow-data = { workspace = true }
+arrow-array = { workspace = true }
 
 flarrow-message = { workspace = true }
 flarrow-layout = { workspace = true }
@@ -35,4 +40,9 @@ crate-type = ["cdylib"]
 [[example]]
 name = "service"
 path = "examples/service.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "client"
+path = "examples/client.rs"
 crate-type = ["cdylib"]

@@ -1,105 +1,77 @@
-use eyre::{Context, OptionExt};
-
-use arrow_data::ArrayData;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::prelude::*;
 
-pub struct RawInput {
-    pub rx: DataflowReceiver,
-}
+use thirdparty::tokio::sync::Mutex;
 
-impl RawInput {
-    pub fn new(rx: DataflowReceiver) -> Self {
-        Self { rx }
-    }
+type SharedMap<K, V> = Arc<Mutex<HashMap<K, V>>>;
+type Receivers = SharedMap<Uuid, MessageReceiver>;
 
-    pub fn recv(&mut self) -> Result<(Header, ArrayData)> {
-        let DataflowMessage { header, data } = self
-            .rx
-            .blocking_recv()
-            .ok_or_eyre("Failed to receive from this input")?;
-
-        Ok((header, data))
-    }
-
-    pub async fn recv_async(&mut self) -> Result<(Header, ArrayData)> {
-        let DataflowMessage { header, data } = self
-            .rx
-            .recv()
-            .await
-            .ok_or_eyre("Failed to receive from this input")?;
-
-        Ok((header, data))
-    }
-}
-
-pub struct Input<T: ArrowMessage> {
-    pub raw: RawInput,
-
-    _phantom: std::marker::PhantomData<T>,
-}
-
-impl<T: ArrowMessage> Input<T> {
-    pub fn new(rx: DataflowReceiver) -> Self {
-        Self {
-            raw: RawInput::new(rx),
-            _phantom: std::marker::PhantomData,
-        }
-    }
-
-    pub fn recv(&mut self) -> Result<(Header, T)> {
-        let (header, data) = self.raw.recv()?;
-
-        Ok((
-            header,
-            T::try_from_arrow(data).wrap_err("Failed to convert arrow 'data' to message T")?,
-        ))
-    }
-
-    pub async fn recv_async(&mut self) -> Result<(Header, T)> {
-        let (header, data) = self.raw.recv_async().await?;
-
-        Ok((
-            header,
-            T::try_from_arrow(data).wrap_err("Failed to convert arrow 'data' to message T")?,
-        ))
-    }
-}
-
+/// Inputs let you manage input connections during a node *implementation*
+#[derive(Debug)]
 pub struct Inputs {
-    node: NodeUUID,
+    receivers: Receivers,
 
-    receivers: SharedMap<InputUUID, DataflowReceiver>,
+    source: NodeLayout,
 }
 
 impl Inputs {
-    pub fn new(node: NodeUUID, receivers: SharedMap<InputUUID, DataflowReceiver>) -> Self {
-        Self { node, receivers }
+    /// Creates a new Inputs instance.
+    pub fn new(receivers: Receivers, source: NodeLayout) -> Self {
+        tracing::debug!(
+            "Creating Inputs entry for node '{}' (uuid: {})",
+            source.label,
+            source.uuid
+        );
+
+        Self { receivers, source }
     }
 
+    async fn compute(
+        &mut self,
+        input: impl Into<String>,
+    ) -> Result<(MessageReceiver, InputLayout)> {
+        let label: String = input.into();
+        let layout = self.source.input(&label);
+
+        let receiver = self
+            .receivers
+            .lock()
+            .await
+            .remove(&layout.uuid)
+            .ok_or_eyre(report_io_not_found(&self.source, &layout))?;
+
+        Ok((receiver, layout))
+    }
+
+    /// Creates a new raw Input, this raw input has no type information so you have
+    /// to manually transform it
     pub async fn raw(&mut self, input: impl Into<String>) -> Result<RawInput> {
-        let id = self.node.input(input);
+        let (receiver, layout) = self.compute(input).await?;
 
-        let receiver = self
-            .receivers
-            .lock()
-            .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
+        tracing::debug!(
+            "Creating new raw input '{}' (uuid: {}) for node '{}' (uuid: {})",
+            layout.label,
+            layout.uuid,
+            self.source.label,
+            self.source.uuid
+        );
 
-        Ok(RawInput::new(receiver))
+        Ok(RawInput::new(receiver, self.source.clone(), layout))
     }
 
+    /// Creates a new Input, this input has type information so it can be directly transformed
     pub async fn with<T: ArrowMessage>(&mut self, input: impl Into<String>) -> Result<Input<T>> {
-        let id = self.node.input(input);
+        let (receiver, layout) = self.compute(input).await?;
 
-        let receiver = self
-            .receivers
-            .lock()
-            .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
+        tracing::debug!(
+            "Creating new input '{}' (uuid: {}) for node '{}' (uuid: {})",
+            layout.label,
+            layout.uuid,
+            self.source.label,
+            self.source.uuid
+        );
 
-        Ok(Input::new(receiver))
+        Ok(Input::new(receiver, self.source.clone(), layout))
     }
 }

@@ -1,4 +1,4 @@
-use flarrow_api::prelude::*;
+use flarrow_api::prelude::{thirdparty::*, *};
 
 #[derive(Node)]
 pub struct MyService {
@@ -30,26 +30,28 @@ impl Node for MyService {
     async fn start(self: Box<Self>) -> Result<()> {
         let mut compare_to_128 = self.compare_to_128;
         let task_128: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
-            loop {
-                compare_to_128
-                    .on_demand_async(async |query| match query > 128 {
-                        true => Ok("Greater than 128".to_string()),
-                        false => Ok("Less than or equal to 128".to_string()),
-                    })
-                    .await?;
-            }
+            while let Ok(()) = compare_to_128
+                .on_demand(async |query| match query > 128 {
+                    true => Ok(format!("{} is greater than 128", query).to_string()),
+                    false => Ok(format!("{} is less than or equal to 128", query).to_string()),
+                })
+                .await
+            {}
+
+            Ok(())
         });
 
         let mut compare_to_64 = self.compare_to_64;
         let task_64: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
-            loop {
-                compare_to_64
-                    .on_demand_async(async |query| match query > 64 {
-                        true => Ok("Greater than 64".to_string()),
-                        false => Ok("Less than or equal to 64".to_string()),
-                    })
-                    .await?
-            }
+            while let Ok(()) = compare_to_64
+                .on_demand(async |query| match query > 64 {
+                    true => Ok(format!("{} is greater than 64", query).to_string()),
+                    false => Ok(format!("{} is less than or equal to 64", query).to_string()),
+                })
+                .await
+            {}
+
+            Ok(())
         });
 
         task_128.await??;

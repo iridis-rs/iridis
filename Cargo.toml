@@ -1,14 +1,16 @@
 [workspace]
 members = [
     "crates/flarrow-api",
-    "crates/flarrow-api-derive",
+    "crates/derive/flarrow-api-derive",
     "crates/flarrow-builtins",
     "crates/flarrow-layout",
     "crates/flarrow-message",
-    "crates/flarrow-message-derive",
+    "crates/derive/flarrow-message-derive",
     "crates/flarrow-runtime",
-    "crates/flarrow-url",
-    "crates/flarrow-url-default",
+    "crates/flarrow-flows",
+    "crates/flarrow-runtime-core",
+    "crates/plugins/flarrow-url-scheme",
+    "crates/plugins/flarrow-file-ext",
 ]
 resolver = "3"
 
@@ -31,7 +33,7 @@ eyre = { version = "0.6", default-features = false, features = [
     "auto-install",
 ] }
 
-url = { version = "2", default-features = false }
+url = { version = "2", default-features = false, features = ["std"] }
 uhlc = { version = "0.8", default-features = false }
 
 serde_yml = "0.0.12"
@@ -58,16 +60,28 @@ tokio = { version = "1", features = [
     "fs",
 ] }
 
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
 flarrow-layout = { version = "0.2.2", path = "crates/flarrow-layout" }
-flarrow-api = { version = "0.2.2", path = "crates/flarrow-api" }
-flarrow-api-derive = { version = "0.2.2", path = "crates/flarrow-api-derive" }
-flarrow-runtime = { version = "0.2.2", path = "crates/flarrow-runtime" }
-flarrow-builtins = { version = "0.2.2", path = "crates/flarrow-builtins" }
-flarrow-url = { version = "0.2.2", path = "crates/flarrow-url" }
-flarrow-url-default = { version = "0.2.2", path = "crates/flarrow-url-default" }
 
 flarrow-message = { version = "0.2.2", path = "crates/flarrow-message" }
-flarrow-message-derive = { version = "0.2.2", path = "crates/flarrow-message-derive" }
+flarrow-message-derive = { version = "0.2.2", path = "crates/derive/flarrow-message-derive" }
+
+flarrow-api = { version = "0.2.2", path = "crates/flarrow-api" }
+flarrow-api-derive = { version = "0.2.2", path = "crates/derive/flarrow-api-derive" }
+
+flarrow-builtins = { version = "0.2.2", path = "crates/flarrow-builtins" }
+
+flarrow-flows = { version = "0.2.2", path = "crates/flarrow-flows" }
+
+flarrow-runtime-core = { version = "0.2.2", path = "crates/flarrow-runtime-core" }
+
+flarrow-file-ext = { version = "0.2.2", path = "crates/plugins/flarrow-file-ext" }
+flarrow-url-scheme = { version = "0.2.2", path = "crates/plugins/flarrow-url-scheme" }
+
+flarrow-runtime = { version = "0.2.2", path = "crates/flarrow-runtime" }
+
 
 [workspace.metadata.release]
 rate-limit.new-packages = 10

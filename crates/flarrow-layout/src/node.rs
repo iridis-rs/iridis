@@ -1,95 +1,169 @@
-use std::collections::HashSet;
-
-use uuid::Uuid;
+use std::collections::{HashMap, HashSet};
 
 use crate::prelude::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct NodeUUID(pub Uuid);
+/// Represents a node
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NodeLayout {
+    pub label: String,
+    pub uuid: Uuid,
+}
 
-impl Default for NodeUUID {
-    fn default() -> Self {
-        Self::new()
+impl NodeLayout {
+    /// Creates a new node layout with a unique UUID v4
+    pub fn new(label: impl Into<String>) -> Self {
+        NodeLayout {
+            label: label.into(),
+            uuid: Uuid::new_v4(),
+        }
+    }
+
+    /// Creates a new input layout with a unique UUID v3 based on the node's UUID and input label
+    pub fn input(&self, input: impl Into<String>) -> InputLayout {
+        let label = input.into();
+        InputLayout {
+            uuid: Uuid::new_v3(&self.uuid, label.as_bytes()),
+            label,
+        }
+    }
+
+    /// Creates a new output layout with a unique UUID v3 based on the node's UUID and output label
+    pub fn output(&self, output: impl Into<String>) -> OutputLayout {
+        let label = output.into();
+        OutputLayout {
+            uuid: Uuid::new_v3(&self.uuid, label.as_bytes()),
+            label,
+        }
+    }
+
+    /// Creates a new query layout with a unique UUID v3 based on the node's UUID and query label
+    pub fn query(&self, query: impl Into<String>) -> QueryLayout {
+        let label = query.into();
+        QueryLayout {
+            uuid: Uuid::new_v3(&self.uuid, label.as_bytes()),
+            label,
+        }
+    }
+
+    /// Creates a new queryable layout with a unique UUID v3 based on the node's UUID and queryable label
+    pub fn queryable(&self, queryable: impl Into<String>) -> QueryableLayout {
+        let label = queryable.into();
+        QueryableLayout {
+            uuid: Uuid::new_v3(&self.uuid, label.as_bytes()),
+            label,
+        }
     }
 }
 
-impl NodeUUID {
-    pub fn new() -> Self {
-        NodeUUID(Uuid::new_v4())
-    }
+/// This is the object passed to the user's lambda function to build the node's IO layout
+pub struct NodeIOBuilder {
+    /// The node layout this io builder is applied to
+    pub layout: NodeLayout,
 
-    pub fn input(&self, input: impl Into<String>) -> InputUUID {
-        InputUUID(Uuid::new_v3(&self.0, input.into().as_bytes()))
-    }
+    /// The runtime only cares about input UUIDs
+    pub inputs: HashSet<Uuid>,
+    /// The runtime only cares about output UUIDs
+    pub outputs: HashSet<Uuid>,
+    /// The runtime only cares about query UUIDs
+    pub queries: HashSet<Uuid>,
+    /// The runtime only cares about queryable UUIDs
+    pub queryables: HashSet<Uuid>,
 
-    pub fn output(&self, output: impl Into<String>) -> OutputUUID {
-        OutputUUID(Uuid::new_v3(&self.0, output.into().as_bytes()))
-    }
-
-    pub fn queryable(&self, queryable: impl Into<String>) -> QueryableUUID {
-        QueryableUUID(Uuid::new_v3(&self.0, queryable.into().as_bytes()))
-    }
-
-    pub fn query(&self, query: impl Into<String>) -> QueryUUID {
-        QueryUUID(Uuid::new_v3(&self.0, query.into().as_bytes()))
-    }
+    /// Labels for the node's IO, useful for debugging and visualization
+    pub labels: HashMap<Uuid, String>,
 }
 
-pub struct NodeIO {
-    pub id: NodeUUID,
-
-    pub inputs: HashSet<InputUUID>,
-    pub outputs: HashSet<OutputUUID>,
-    pub queryables: HashSet<QueryableUUID>,
-    pub queries: HashSet<QueryUUID>,
-}
-
-impl Default for NodeIO {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl NodeIO {
-    pub fn new() -> Self {
+impl NodeIOBuilder {
+    pub fn new(layout: &NodeLayout) -> Self {
         Self {
-            id: NodeUUID::new(),
+            layout: layout.clone(),
+
             inputs: HashSet::new(),
             outputs: HashSet::new(),
             queryables: HashSet::new(),
             queries: HashSet::new(),
+
+            labels: HashMap::new(),
         }
     }
 
-    pub fn open_input(&mut self, input: impl Into<String>) -> InputUUID {
-        let input_id = self.id.input(input);
+    /// Creates a new input layout with the given label
+    pub fn input(&mut self, input: impl Into<String>) -> IOLayout {
+        let label: String = input.into();
+        let layout = self.layout.input(&label);
 
-        self.inputs.insert(input_id);
+        self.inputs.insert(layout.uuid);
 
-        input_id
+        self.labels.insert(layout.uuid, label.clone());
+
+        tracing::debug!(
+            "Node '{}' (uuid: {}) added input layout with label: '{}' (uuid: {})",
+            self.layout.label,
+            self.layout.uuid,
+            label,
+            layout.uuid
+        );
+
+        layout.into()
     }
 
-    pub fn open_output(&mut self, output: impl Into<String>) -> OutputUUID {
-        let output_id = self.id.output(output);
+    /// Creates a new output layout with the given label
+    pub fn output(&mut self, output: impl Into<String>) -> IOLayout {
+        let label: String = output.into();
+        let layout = self.layout.output(&label);
 
-        self.outputs.insert(output_id);
+        self.outputs.insert(layout.uuid);
 
-        output_id
+        self.labels.insert(layout.uuid, label.clone());
+
+        tracing::debug!(
+            "Node '{}' (uuid: {}) added output layout with label: '{}' (uuid: {})",
+            self.layout.label,
+            self.layout.uuid,
+            label,
+            layout.uuid
+        );
+
+        layout.into()
     }
 
-    pub fn open_queryable(&mut self, queryable: impl Into<String>) -> QueryableUUID {
-        let queryable_id = self.id.queryable(queryable);
+    /// Creates a new query layout with the given label
+    pub fn query(&mut self, query: impl Into<String>) -> IOLayout {
+        let label: String = query.into();
+        let layout = self.layout.query(&label);
 
-        self.queryables.insert(queryable_id);
+        self.queries.insert(layout.uuid);
 
-        queryable_id
+        self.labels.insert(layout.uuid, label.clone());
+
+        tracing::debug!(
+            "Node '{}' (uuid: {}) added query layout with label: '{}' (uuid: {})",
+            self.layout.label,
+            self.layout.uuid,
+            label,
+            layout.uuid
+        );
+
+        layout.into()
     }
 
-    pub fn open_query(&mut self, query: impl Into<String>) -> QueryUUID {
-        let query_id = self.id.query(query);
+    /// Creates a new queryable layout with the given label
+    pub fn queryable(&mut self, queryable: impl Into<String>) -> IOLayout {
+        let label: String = queryable.into();
+        let layout = self.layout.queryable(&label);
 
-        self.queries.insert(query_id);
+        self.queryables.insert(layout.uuid);
 
-        query_id
+        self.labels.insert(layout.uuid, label.clone());
+
+        tracing::debug!(
+            "Node '{}' (uuid: {}) added queryable layout with label: '{}' (uuid: {})",
+            self.layout.label,
+            self.layout.uuid,
+            label,
+            layout.uuid
+        );
+
+        layout.into()
     }
 }

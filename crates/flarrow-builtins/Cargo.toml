@@ -13,8 +13,12 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
+[features]
+cdylib = []
+
 [dependencies]
 eyre = { workspace = true }
 tokio = { workspace = true }
+serde_yml = { workspace = true }
 
 flarrow-api = { workspace = true }

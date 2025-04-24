@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use arrow_array::*;
-    use arrow_data::*;
     use flarrow_message::prelude::*;
+    use thirdparty::{arrow_array::*, arrow_data::ArrayData};
 
     #[test]
     fn test_zero_copy() {

@@ -1,4 +1,4 @@
-use flarrow_api::prelude::*;
+use flarrow_api::prelude::{thirdparty::*, *};
 
 #[derive(Node)]
 pub struct MySink {
@@ -20,7 +20,7 @@ impl Node for MySink {
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
-        while let Ok((_, message)) = self.input.recv_async().await {
+        while let Ok((_, message)) = self.input.recv().await {
             println!("Received message: {}", message);
         }
 

@@ -7,6 +7,7 @@ build:
     cargo build --examples
     cargo build --example sink --features cdylib
     cargo build --example service --features cdylib
+    cargo build --example client --features cdylib
 
 simple_runtime: build
     cargo run --example simple_runtime
