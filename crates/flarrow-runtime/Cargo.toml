@@ -19,11 +19,18 @@ cdylib = []
 [dependencies]
 eyre = { workspace = true }
 tokio = { workspace = true }
-uhlc = { workspace = true }
 url = { workspace = true }
-libloading = { workspace = true }
+uhlc = { workspace = true }
+serde_yml = { workspace = true }
 
-flarrow-url = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
 flarrow-api = { workspace = true }
+flarrow-runtime-core = { workspace = true }
+flarrow-flows = { workspace = true }
+flarrow-builtins = { workspace = true }
 
-flarrow-url-default = { workspace = true }
+flarrow-file-ext = { workspace = true }
+flarrow-url-scheme = { workspace = true }
+flarrow-layout = { workspace = true }

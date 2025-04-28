@@ -1,65 +1,38 @@
-use std::sync::Arc;
+use flarrow_builtins::prelude::*;
+use flarrow_file_ext::prelude::*;
+use flarrow_flows::prelude::*;
+use flarrow_layout::prelude::*;
+use flarrow_url_scheme::prelude::*;
 
-use flarrow_runtime::prelude::*;
-
-use url::Url;
-
-#[derive(Node)]
-pub struct MyOperator {
-    pub input: Input<String>,
-    pub output: Output<String>,
-
-    counter: u32,
-}
-
-#[node(runtime = "default_runtime")]
-impl Node for MyOperator {
-    async fn new(
-        mut inputs: Inputs,
-        mut outputs: Outputs,
-        _: Queries,
-        _: Queryables,
-        _: serde_yml::Value,
-    ) -> Result<Self> {
-        Ok(Self {
-            input: inputs.with("in").await?,
-            output: outputs.with("out").await?,
-            counter: 0,
-        })
-    }
-
-    async fn start(mut self: Box<Self>) -> Result<()> {
-        while let Ok((_, message)) = self.input.recv_async().await {
-            self.counter += 1;
-
-            self.output
-                .send_async(format!("{} - {}", self.counter, message))
-                .await
-                .wrap_err("Failed to send message")?;
-        }
-
-        Ok(())
-    }
-}
+use flarrow_runtime::prelude::{thirdparty::*, *};
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    tracing_subscriber::fmt::init();
+
     let mut layout = DataflowLayout::new();
 
     let (source, output) = layout
-        .create_node(async |io: &mut NodeIO| io.open_output("out"))
+        .node("source", async |builder: &mut NodeIOBuilder| {
+            builder.output("out")
+        })
         .await;
 
     let (operator, (op_in, op_out)) = layout
-        .create_node(async |io: &mut NodeIO| (io.open_input("in"), io.open_output("out")))
+        .node("operator", async |builder: &mut NodeIOBuilder| {
+            (builder.input("in"), builder.output("out"))
+        })
         .await;
 
     let (sink, input) = layout
-        .create_node(async |io: &mut NodeIO| io.open_input("in"))
+        .node("sink", async |builder: &mut NodeIOBuilder| {
+            builder.input("in")
+        })
         .await;
 
-    let layout = Arc::new(layout);
-    let flows = Flows::new(layout.clone(), async move |builder: &mut Builder| {
+    let layout = layout.build();
+
+    let flows = Flows::new(layout.clone(), async move |builder: &mut FlowsBuilder| {
         builder.connect(op_in, output, None)?;
         builder.connect(input, op_out, None)?;
 
@@ -67,30 +40,28 @@ async fn main() -> Result<()> {
     })
     .await?;
 
-    let path = std::env::var("CARGO_MANIFEST_DIR")?;
-    let examples = format!("file://{}/../../target/debug/examples", path);
-
-    let runtime = DataflowRuntime::new(flows, None, async move |loader: &mut Loader| {
-        loader
-            .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load MyOperator")?;
-
-        let source_file = Url::parse("builtin:///timer")?;
-        let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
-
-        loader
-            .load_from_url(source, source_file, serde_yml::from_str("frequency: 5.0")?)
-            .await
-            .wrap_err("Failed to load source")?;
-        loader
-            .load_from_url(sink, sink_file, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load sink")?;
-
-        Ok(())
-    })
+    let runtime = Runtime::new(
+        async |_file_ext: &mut FileExtManagerBuilder, _url_scheme: &mut UrlSchemeManagerBuilder| {
+            Ok(())
+        },
+    )
     .await?;
 
-    runtime.run().await
+    runtime
+        .run(flows, async move |loader: &mut NodeLoader| {
+            loader
+                .load::<Timer>(source, serde_yml::from_str("frequency: 1.0")?)
+                .await?;
+
+            loader
+                .load::<Transport>(operator, serde_yml::from_str("")?)
+                .await?;
+
+            loader
+                .load::<Printer>(sink, serde_yml::from_str("")?)
+                .await?;
+
+            Ok(())
+        })
+        .await
 }

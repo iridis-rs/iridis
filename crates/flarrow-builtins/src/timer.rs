@@ -2,20 +2,8 @@ use std::time::Duration;
 
 use crate::prelude::*;
 
-static TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
-    std::sync::LazyLock::new(|| {
-        tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime")
-    });
-
-fn default_runtime<T: Send + 'static>(
-    task: impl Future<Output = T> + Send + 'static,
-) -> tokio::task::JoinHandle<T> {
-    match tokio::runtime::Handle::try_current() {
-        Ok(handle) => handle.spawn(task),
-        Err(_) => TOKIO_RUNTIME.spawn(task),
-    }
-}
-
+/// Simple source node that emits a "tick" message at a specified frequency.
+#[derive(Node)]
 pub struct Timer {
     pub output: Output<String>,
     pub frequency: f64,

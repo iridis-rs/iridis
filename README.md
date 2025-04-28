@@ -14,24 +14,34 @@ Flarrow (flow + arrow) is a rust framework for building dataflow applications. T
 
 ## Layout
 
-The first thing to do is to define the layout of your application. This is done by creating a `DataflowLayout` instance and then adding nodes to it. When creating a node the user provides a closure that takes a mutable reference to a `NodeIO` and returns optionally a future that resolves to a tuple of input and output streams. This is `async` compatible, so you can use `async` code inside the closure if you want to perform additional asynchronous operations.
+The first thing to do is to define the layout of your application. This is done by creating a `DataflowLayout` instance and then adding nodes to it. When creating a node the user provides a closure that takes a mutable reference to a `NodeIOBuilder` and returns optionally a future that resolves to a tuple of input and output streams. This is `async` compatible, so you can use `async` code inside the closure if you want to perform additional asynchronous operations.
 
 ```rust
+use flarrow_layout::prelude::{thirdparty::*, *};
+
 #[tokio::main]
 async fn main() {
     let mut layout = DataflowLayout::new();
 
     let (source, output) = layout
-        .create_node(async |io: &mut NodeIO| io.open_output("out"))
+        .node("source", async |builder: &mut NodeIOBuilder| {
+            builder.output("out")
+        })
         .await;
 
     let (operator, (op_in, op_out)) = layout
-        .create_node(async |io: &mut NodeIO| (io.open_input("in"), io.open_output("out")))
+        .node("operator", async |builder: &mut NodeIOBuilder| {
+            (builder.input("in"), builder.output("out"))
+        })
         .await;
 
     let (sink, input) = layout
-        .create_node(async |io: &mut NodeIO| io.open_input("in"))
+        .node("sink", async |builder: &mut NodeIOBuilder| {
+            builder.input("in")
+        })
         .await;
+
+    let layout = layout.build();
 
     Ok(())
 }
@@ -39,10 +49,10 @@ async fn main() {
 
 ## Node API
 
-You must then create the implementation of your nodes. You can either make a rust library or a `cdylib` to be passed to the `flarrow-runtime`. It relies on a `tokio` runtime: it will choose the current one if there is one available (`rlib`) or create a new one if none is available (`cdylib`). You can totally control the runtime by passing a custom function instead of `default_runtime`.
+You must then create the implementation of your nodes. You can either make a rust library or a `cdylib` to be passed to the `flarrow-runtime`. It relies on a `tokio` runtime: it will choose the current one if there is one available (`crate`) or create a new one if none is available (`cdylib`). You can totally control the runtime by passing a custom function instead of `default_runtime`.
 
 ```rust
-use flarrow_api::prelude::*;
+use flarrow_api::prelude::{thirdparty::*, *};
 
 #[derive(Node)]
 pub struct MySink {
@@ -64,7 +74,7 @@ impl Node for MySink {
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
-        while let Ok((_, message)) = self.input.recv_async().await {
+        while let Ok((_, message)) = self.input.recv().await {
             println!("Received message: {}", message);
         }
 
@@ -89,64 +99,88 @@ fn default_runtime<T: Send + 'static>(
 }
 ```
 
-## Runtime
+**Note**: The code above is automatically added when you use `#[derive(Node)]`.
 
-Now you've created a layout and implemented your nodes, you can create the connections between the nodes and load the implementation for each one. This is done by creating a `Flows` struct first, and then creating a `DataflowRuntime` instance. As you can see, the flows creation are defined in an `async` closure so you can use `async` code in it. You can also see that you can load the implementation for each node using the either `load_statically_linked` or `load_from_url`. The first one is intented to be used with `rlib` nodes, and the second one is intented to be used with `cdylib` or `builtin` nodes (which are `rlib` nodes already integrated into the runtime).
+**Note**: The `crate` or `cdylib` version can have the same code! But in order to get a usable `libX.so` you need to compile your crate with the `--features cdylib` flag. If enabled it will generate the symbols for your node.
+
+## Flows
+
+Now you've created a layout and implemented your nodes, you can create the connections between the nodes. This is done by creating a `Flows` struct. As you can see, the flows creation are defined in an `async` closure so you can use `async` code in it.
 
 ```rust
-let flows = Flows::new(layout.clone(), async move |builder: &mut Builder| {
-    builder.connect(op_in, output, None)?;
-    builder.connect(input, op_out, None)?;
+use flarrow_layout::prelude::{thirdparty::*, *};
 
-    Ok(())
-})
-.await?;
+#[tokio::main]
+async fn main() {
+    let mut layout = DataflowLayout::new();
 
-let runtime = DataflowRuntime::new(
-    flows,
-    None, // will use the default one
-    async move |loader: &mut Loader| {
-        loader
-            .load_statically_linked::<MyOperator>(operator, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load MyOperator")?;
+    let (source, output) = layout
+        .node("source", async |builder: &mut NodeIOBuilder| {
+            builder.output("out")
+        })
+        .await;
 
-        let source_file = Url::parse("builtin:///timer")?;
-        let sink_file = Url::parse(&format!("{}/libsink.so", examples))?;
+    let (operator, (op_in, op_out)) = layout
+        .node("operator", async |builder: &mut NodeIOBuilder| {
+            (builder.input("in"), builder.output("out"))
+        })
+        .await;
 
-        loader
-            .load_from_url(source, source_file, serde_yml::from_str("frequency: 5.0")?)
-            .await
-            .wrap_err("Failed to load source")?;
-        loader
-            .load_from_url(sink, sink_file, serde_yml::Value::from(""))
-            .await
-            .wrap_err("Failed to load sink")?;
+    let (sink, input) = layout
+        .node("sink", async |builder: &mut NodeIOBuilder| {
+            builder.input("in")
+        })
+        .await;
+
+    let layout = layout.build();
+
+    let flows = Flows::new(layout.clone(), async move |builder: &mut FlowsBuilder| {
+        builder.connect(op_in, output, None)?;
+        builder.connect(input, op_out, None)?;
 
         Ok(())
-    },
-)
-.await?;
+    })
+    .await?;
+
+    Ok(())
+}
 ```
 
-Finally you can start the runtime by calling `runtime.run().await`
+## Runtime
 
-## A word about `load_from_url`
+This part is the most complex one. The `flarrow-runtime` is pluggable, and so you need to understand what kind of plugin one can provide.
 
-To use `load_from_url`, you need to provide a URL Plugin that implements the `UrlPlugin` trait. It can be either a statically linked `rlib` or a dynamically linked `cdylib`. The URL Plugin is responsible for loading the node implementation from the provided URL. You can create your own URL Plugin to support various protocols and formats, such as HTTP, HTTPS, FTP or .py files.
+### `RuntimePlugin`
 
-The provided `UrlDefaultPlugin` only works with the `builtin://` and `file://` schemes.
+The first kind of plugin is the `RuntimePlugin`. You can provide the `flarrow-runtime` multiple `RuntimePlugin` and they will all be launched together with the classic runtime and they will be able to interact with it, manipulate your nodes, expose them to the internet etc...
+
+There is only one official `RuntimePlugin` backed by `flarrow-rs`:
+
+- `FlarrowZenohPlugin`: this plugin will expose all your nodes to the `zenoh` network, making it possible to monitor your flows and even send messages to specific nodes
+
+### Plugin when loading nodes
+
+When loading nodes to the `flarrow-runtime`, you can either linked them statically (when you use the Cargo `crate` directly), or load them via an `url` in this format: `scheme://some_address`.
+
+#### `SchemePlugin`
+
+A scheme plugin is responsible of handling all `url` starting with the `scheme` they are targeting. By default, with no additional plugins, the `flarrow-runtime` can handle `file:///path/to/file.{dylib}` schemes and `builtin://name/of/a/builtin/node`.
+
+You can then add your own plugin to handle other custom schemes (`http://`, `ssh://`, etc...)
+
+**How it works**: Usually, a `SchemePlugin` handles an `url` by doing some work and then returning a `PathBuf` that will be handled by the `ExtensionPlugin` corresponding to this file extension.
+
+#### `ExtensionPlugin`
+
+An extension plugin is responsible of handling a `PathBuf` with the file extension it's targeting. By default, with no additional plugins, the `flarrow-runtime` can hanle `.so`, `.dylib` and `.dll` file extensions.
+
+There is only one official `ExtensionPlugin` backed by `flarrow-rs`:
+
+- `PythonPlugin`: this plugin handles `.py` files
 
 # Examples
 
-You can run the examples provided in this repository. Start by building the all:
+You can run the examples provided in this repository. For convenience use the `justfile` provided:
 
-```
-cargo build --examples
-```
-
-And then you can run the `runtime` example:
-
-```
-cargo run --example runtime
-```
+- `just simple_runtime`, this launches a simple dataflow (the one in this README)
+- `just service_runtime`, this launches a dataflow with a service node and a client node

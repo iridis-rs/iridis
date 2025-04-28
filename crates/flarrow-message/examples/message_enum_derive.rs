@@ -1,7 +1,7 @@
-use arrow_array::*;
-use arrow_data::*;
-
-use flarrow_message::prelude::*;
+use flarrow_message::prelude::{
+    thirdparty::{arrow_array::*, arrow_data::*, *},
+    *,
+};
 
 #[derive(Debug, ArrowMessage)]
 enum Encoding {
@@ -25,7 +25,7 @@ struct Image {
     metadata: Option<Metadata>,
 }
 
-fn main() -> ArrowResult<()> {
+fn main() -> Result<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {

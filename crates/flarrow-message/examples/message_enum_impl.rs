@@ -1,8 +1,7 @@
-use arrow_array::*;
-use arrow_data::*;
-use arrow_schema::*;
-
-use flarrow_message::prelude::*;
+use flarrow_message::prelude::{
+    thirdparty::{arrow_array::*, arrow_data::*, arrow_schema::*, *},
+    *,
+};
 
 #[derive(Debug)]
 enum Encoding {
@@ -22,16 +21,13 @@ impl Encoding {
         }
     }
 
-    pub fn try_from_string(value: String) -> ArrowResult<Self> {
+    pub fn try_from_string(value: String) -> Result<Self> {
         match value.as_str() {
             "RGB8" => Ok(Encoding::RGB8),
             "RGBA8" => Ok(Encoding::RGBA8),
             "BGR8" => Ok(Encoding::BGR8),
             "BGRA8" => Ok(Encoding::BGRA8),
-            _ => Err(ArrowError::ParseError(format!(
-                "Invalid encoding: {}",
-                value
-            ))),
+            _ => Err(eyre::eyre!("Invalid encoding: {}", value)),
         }
     }
 }
@@ -41,27 +37,27 @@ impl ArrowMessage for Encoding {
         String::field(name)
     }
 
-    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self> {
+    fn try_from_arrow(data: ArrayData) -> Result<Self> {
         Encoding::try_from_string(String::try_from_arrow(data)?)
     }
 
-    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
+    fn try_into_arrow(self) -> Result<ArrayRef> {
         String::try_into_arrow(self.into_string())
     }
 }
 
 impl TryFrom<ArrayData> for Encoding {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(data: ArrayData) -> ArrowResult<Self> {
+    fn try_from(data: ArrayData) -> Result<Self> {
         Encoding::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Encoding> for ArrayData {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(metadata: Encoding) -> ArrowResult<Self> {
+    fn try_from(metadata: Encoding) -> Result<Self> {
         metadata.try_into_arrow().map(|array| array.into_data())
     }
 }
@@ -87,7 +83,7 @@ impl ArrowMessage for Metadata {
         )
     }
 
-    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
+    fn try_from_arrow(data: ArrayData) -> Result<Self>
     where
         Self: Sized,
     {
@@ -101,7 +97,7 @@ impl ArrowMessage for Metadata {
         })
     }
 
-    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
+    fn try_into_arrow(self) -> Result<ArrayRef> {
         let union_fields = get_union_fields::<Self>()?;
 
         make_union_array(
@@ -117,17 +113,17 @@ impl ArrowMessage for Metadata {
 }
 
 impl TryFrom<ArrayData> for Metadata {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(data: ArrayData) -> ArrowResult<Self> {
+    fn try_from(data: ArrayData) -> Result<Self> {
         Metadata::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Metadata> for ArrayData {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(metadata: Metadata) -> ArrowResult<Self> {
+    fn try_from(metadata: Metadata) -> Result<Self> {
         metadata.try_into_arrow().map(|array| array.into_data())
     }
 }
@@ -149,7 +145,7 @@ impl ArrowMessage for Image {
         )
     }
 
-    fn try_from_arrow(data: ArrayData) -> ArrowResult<Self>
+    fn try_from_arrow(data: ArrayData) -> Result<Self>
     where
         Self: Sized,
     {
@@ -161,7 +157,7 @@ impl ArrowMessage for Image {
         })
     }
 
-    fn try_into_arrow(self) -> ArrowResult<ArrayRef> {
+    fn try_into_arrow(self) -> Result<ArrayRef> {
         let union_fields = get_union_fields::<Self>()?;
 
         make_union_array(
@@ -172,22 +168,22 @@ impl ArrowMessage for Image {
 }
 
 impl TryFrom<ArrayData> for Image {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(data: ArrayData) -> ArrowResult<Self> {
+    fn try_from(data: ArrayData) -> Result<Self> {
         Image::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Image> for ArrayData {
-    type Error = ArrowError;
+    type Error = eyre::Report;
 
-    fn try_from(image: Image) -> ArrowResult<Self> {
+    fn try_from(image: Image) -> Result<Self> {
         image.try_into_arrow().map(|array| array.into_data())
     }
 }
 
-fn main() -> ArrowResult<()> {
+fn main() -> Result<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {

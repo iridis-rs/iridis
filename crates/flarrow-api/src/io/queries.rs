@@ -1,194 +1,105 @@
-use eyre::{Context, OptionExt};
-use std::sync::Arc;
-
-use arrow_array::Array;
-use arrow_data::ArrayData;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::prelude::*;
+use thirdparty::tokio::sync::Mutex;
 
-pub struct RawQuery {
-    clock: Arc<uhlc::HLC>,
-    uuid: QueryUUID,
+type SharedMap<K, V> = Arc<Mutex<HashMap<K, V>>>;
+type Senders = SharedMap<Uuid, MessageSender>;
+type Receivers = SharedMap<Uuid, MessageReceiver>;
 
-    pub tx: DataflowSender,
-    pub rx: DataflowReceiver,
-}
-
-impl RawQuery {
-    pub fn new(
-        clock: Arc<uhlc::HLC>,
-        uuid: QueryUUID,
-        tx: DataflowSender,
-        rx: DataflowReceiver,
-    ) -> Self {
-        Self {
-            tx,
-            rx,
-            clock,
-            uuid,
-        }
-    }
-
-    pub fn query(&mut self, data: ArrayData) -> Result<(Header, ArrayData)> {
-        let data = DataflowMessage {
-            header: Header {
-                timestamp: self.clock.new_timestamp(),
-                node: None,
-                source: Some(Source::Query(self.uuid)),
-            },
-            data,
-        };
-
-        self.tx
-            .blocking_send(data)
-            .wrap_err("Failed to send to this output")?;
-
-        let DataflowMessage { header, data } = self
-            .rx
-            .blocking_recv()
-            .ok_or_eyre("Failed to receive from this input")?;
-
-        Ok((header, data))
-    }
-
-    pub async fn query_async(&mut self, data: ArrayData) -> Result<(Header, ArrayData)> {
-        let data = DataflowMessage {
-            header: Header {
-                timestamp: self.clock.new_timestamp(),
-                node: None,
-                source: Some(Source::Query(self.uuid)),
-            },
-            data,
-        };
-
-        self.tx
-            .send(data)
-            .await
-            .wrap_err("Failed to send to this output")?;
-
-        let DataflowMessage { header, data } = self
-            .rx
-            .recv()
-            .await
-            .ok_or_eyre("Failed to receive from this input")?;
-
-        Ok((header, data))
-    }
-}
-
-pub struct Query<T: ArrowMessage, F: ArrowMessage> {
-    pub raw: RawQuery,
-
-    _phantom: std::marker::PhantomData<(T, F)>,
-}
-
-impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
-    pub fn new(
-        clock: Arc<uhlc::HLC>,
-        uuid: QueryUUID,
-        tx: DataflowSender,
-        rx: DataflowReceiver,
-    ) -> Self {
-        Self {
-            raw: RawQuery::new(clock, uuid, tx, rx),
-            _phantom: std::marker::PhantomData,
-        }
-    }
-
-    pub fn query(&mut self, data: T) -> Result<(Header, F)> {
-        let (header, data) = self.raw.query(
-            data.try_into_arrow()
-                .wrap_err("Failed to convert arrow 'data' to message T")?
-                .into_data(),
-        )?;
-
-        Ok((
-            header,
-            F::try_from_arrow(data).wrap_err("Failed to convert arrow 'data' to message T")?,
-        ))
-    }
-
-    pub async fn query_async(&mut self, data: T) -> Result<(Header, F)> {
-        let (header, data) = self
-            .raw
-            .query_async(
-                data.try_into_arrow()
-                    .wrap_err("Failed to convert arrow 'data' to message T")?
-                    .into_data(),
-            )
-            .await?;
-
-        Ok((
-            header,
-            F::try_from_arrow(data).wrap_err("Failed to convert arrow 'data' to message T")?,
-        ))
-    }
-}
-
+/// Queries let you manage query connections during a node *implementation*
 pub struct Queries {
-    node: NodeUUID,
+    senders: Senders,
+    receivers: Receivers,
 
     clock: Arc<uhlc::HLC>,
 
-    senders: SharedMap<QueryUUID, DataflowSender>,
-    receivers: SharedMap<QueryUUID, DataflowReceiver>,
+    source: NodeLayout,
 }
 
 impl Queries {
+    /// Creates a new instance of `Queries`.
     pub fn new(
-        node: NodeUUID,
+        senders: Senders,
+        receivers: Receivers,
         clock: Arc<uhlc::HLC>,
-        senders: SharedMap<QueryUUID, DataflowSender>,
-        receivers: SharedMap<QueryUUID, DataflowReceiver>,
+        source: NodeLayout,
     ) -> Self {
         Self {
-            node,
-            clock,
             senders,
             receivers,
+            clock,
+            source,
         }
     }
 
-    pub async fn raw(&mut self, query: impl Into<String>) -> Result<RawQuery> {
-        let id = self.node.query(query);
+    async fn compute(
+        &mut self,
+        query: impl Into<String>,
+    ) -> Result<(MessageSender, MessageReceiver, QueryLayout)> {
+        let label: String = query.into();
+        let layout = self.source.query(&label);
 
         let sender = self
             .senders
             .lock()
             .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
+            .remove(&layout.uuid)
+            .ok_or_eyre(report_io_not_found(&self.source, &layout))?;
 
         let receiver = self
             .receivers
             .lock()
             .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
+            .remove(&layout.uuid)
+            .ok_or_eyre(report_io_not_found(&self.source, &layout))?;
 
-        Ok(RawQuery::new(self.clock.clone(), id, sender, receiver))
+        Ok((sender, receiver, layout))
     }
 
+    /// Creates a new raw Query, this raw query has no type information so you have
+    /// to manually transform it
+    pub async fn raw(&mut self, query: impl Into<String>) -> Result<RawQuery> {
+        let (tx, rx, layout) = self.compute(query).await?;
+
+        tracing::debug!(
+            "Creating new raw query '{}' (uuid: {}) for node '{}' (uuid: {})",
+            layout.label,
+            layout.uuid,
+            self.source.label,
+            self.source.uuid
+        );
+
+        Ok(RawQuery::new(
+            tx,
+            rx,
+            self.clock.clone(),
+            self.source.clone(),
+            layout,
+        ))
+    }
+
+    /// Creates a new query, this query has type information
     pub async fn with<T: ArrowMessage, F: ArrowMessage>(
         &mut self,
         query: impl Into<String>,
     ) -> Result<Query<T, F>> {
-        let id = self.node.query(query);
+        let (tx, rx, layout) = self.compute(query).await?;
 
-        let sender = self
-            .senders
-            .lock()
-            .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
+        tracing::debug!(
+            "Creating new query '{}' (uuid: {}) for node '{}' (uuid: {})",
+            layout.label,
+            layout.uuid,
+            self.source.label,
+            self.source.uuid
+        );
 
-        let receiver = self
-            .receivers
-            .lock()
-            .await
-            .remove(&id)
-            .ok_or_eyre(format!("Input {} not found", id.0))?;
-
-        Ok(Query::new(self.clock.clone(), id, sender, receiver))
+        Ok(Query::new(
+            tx,
+            rx,
+            self.clock.clone(),
+            self.source.clone(),
+            layout,
+        ))
     }
 }
