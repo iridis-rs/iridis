@@ -32,7 +32,7 @@ impl Node for Timer {
     async fn start(self: Box<Self>) -> Result<()> {
         loop {
             self.output
-                .send_async("tick".to_string())
+                .send("tick".to_string())
                 .await
                 .wrap_err("Failed to send message")?;
 

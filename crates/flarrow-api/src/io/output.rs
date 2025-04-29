@@ -37,7 +37,7 @@ impl<T: ArrowMessage> Output<T> {
     }
 
     /// Send a message to the output asynchronously.
-    pub async fn send_async(&self, data: T) -> Result<()> {
+    pub async fn send(&self, data: T) -> Result<()> {
         self.raw
             .send(
                 data.try_into_arrow()
