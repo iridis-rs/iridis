@@ -293,11 +293,21 @@ version = "0.3.0"
 dependencies = [
  "eyre",
  "flarrow-api",
+ "flarrow-file-ext-derive",
  "flarrow-runtime-core",
  "libloading",
  "serde_yml",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "flarrow-file-ext-derive"
+version = "0.3.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -356,6 +366,7 @@ dependencies = [
  "flarrow-layout",
  "flarrow-runtime-core",
  "flarrow-url-scheme",
+ "libloading",
  "serde_yml",
  "tokio",
  "tracing",
@@ -381,11 +392,21 @@ dependencies = [
  "flarrow-api",
  "flarrow-file-ext",
  "flarrow-runtime-core",
+ "flarrow-url-scheme-derive",
  "libloading",
  "serde_yml",
  "tokio",
  "tracing",
  "url",
+]
+
+[[package]]
+name = "flarrow-url-scheme-derive"
+version = "0.3.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

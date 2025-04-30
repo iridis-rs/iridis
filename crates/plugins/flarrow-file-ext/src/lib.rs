@@ -1,14 +1,14 @@
 pub(crate) mod file_ext;
-pub(crate) mod file_ext_default;
 pub(crate) mod plugin;
 
 pub mod prelude {
     pub use crate::file_ext::*;
-    pub use crate::file_ext_default::*;
     pub use crate::plugin::*;
 
-    pub(crate) use flarrow_api::prelude::*;
-    pub(crate) use flarrow_runtime_core::prelude::*;
+    pub use flarrow_file_ext_derive::*;
+
+    pub use flarrow_api::{self, prelude::*};
+    pub use flarrow_runtime_core::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

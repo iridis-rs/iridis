@@ -12,8 +12,8 @@ pub mod prelude {
 
     pub(crate) use crate::report::*;
 
-    pub(crate) use flarrow_layout::prelude::*;
-    pub(crate) use flarrow_message::prelude::*;
+    pub use flarrow_layout::{self, prelude::*};
+    pub use flarrow_message::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

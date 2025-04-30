@@ -25,3 +25,4 @@ flarrow-api = { workspace = true }
 flarrow-runtime-core = { workspace = true }
 
 flarrow-file-ext = { workspace = true }
+flarrow-url-scheme-derive = { workspace = true }

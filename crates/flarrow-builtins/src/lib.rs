@@ -10,7 +10,7 @@ pub mod prelude {
     pub use crate::timer::*;
     pub use crate::transport::*;
 
-    pub(crate) use flarrow_api::prelude::*;
+    pub use flarrow_api::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

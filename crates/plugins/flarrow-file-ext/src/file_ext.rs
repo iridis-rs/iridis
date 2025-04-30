@@ -43,15 +43,9 @@ impl FileExtManager {
 
 impl FileExtManagerBuilder {
     pub async fn new() -> Result<Self> {
-        let mut manager = FileExtManagerBuilder {
+        Ok(FileExtManagerBuilder {
             plugins: HashMap::new(),
-        };
-
-        manager
-            .load_statically_linked_plugin::<DefaultFileExtPlugin>()
-            .await?;
-
-        Ok(manager)
+        })
     }
 
     pub async fn load_statically_linked_plugin<T: FileExtPlugin + 'static>(

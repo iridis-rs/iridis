@@ -49,15 +49,9 @@ impl UrlSchemeManager {
 
 impl UrlSchemeManagerBuilder {
     pub async fn new() -> Result<Self> {
-        let mut builder = Self {
+        Ok(Self {
             plugins: HashMap::new(),
-        };
-
-        builder
-            .load_statically_linked_plugin::<DefaultUrlSchemePlugin>()
-            .await?;
-
-        Ok(builder)
+        })
     }
 
     pub async fn load_statically_linked_plugin<T: UrlSchemePlugin + 'static>(

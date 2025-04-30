@@ -23,6 +23,14 @@ impl Runtime {
         let mut file_ext = FileExtManagerBuilder::new().await?;
         let mut url_scheme = UrlSchemeManagerBuilder::new().await?;
 
+        file_ext
+            .load_statically_linked_plugin::<DefaultFileExtPlugin>()
+            .await?;
+
+        url_scheme
+            .load_statically_linked_plugin::<DefaultUrlSchemePlugin>()
+            .await?;
+
         plugins(&mut file_ext, &mut url_scheme).await?;
 
         Ok(Self {

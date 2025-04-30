@@ -11,6 +11,8 @@ members = [
     "crates/flarrow-runtime-core",
     "crates/plugins/flarrow-url-scheme",
     "crates/plugins/flarrow-file-ext",
+    "crates/derive/flarrow-file-ext-derive",
+    "crates/derive/flarrow-url-scheme-derive",
 ]
 resolver = "3"
 
@@ -78,7 +80,9 @@ flarrow-flows = { version = "0.3.0", path = "crates/flarrow-flows" }
 flarrow-runtime-core = { version = "0.3.0", path = "crates/flarrow-runtime-core" }
 
 flarrow-file-ext = { version = "0.3.0", path = "crates/plugins/flarrow-file-ext" }
+flarrow-file-ext-derive = { version = "0.3.0", path = "crates/derive/flarrow-file-ext-derive" }
 flarrow-url-scheme = { version = "0.3.0", path = "crates/plugins/flarrow-url-scheme" }
+flarrow-url-scheme-derive = { version = "0.3.0", path = "crates/derive/flarrow-url-scheme-derive" }
 
 flarrow-runtime = { version = "0.3.0", path = "crates/flarrow-runtime" }
 

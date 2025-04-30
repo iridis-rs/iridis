@@ -1,15 +1,14 @@
 pub(crate) mod plugin;
 pub(crate) mod url_scheme;
-pub(crate) mod url_scheme_default;
 
 pub mod prelude {
     pub use crate::plugin::*;
     pub use crate::url_scheme::*;
-    pub use crate::url_scheme_default::*;
 
-    pub(crate) use flarrow_api::prelude::*;
-    pub(crate) use flarrow_file_ext::prelude::*;
-    pub(crate) use flarrow_runtime_core::prelude::*;
+    pub use flarrow_url_scheme_derive::*;
+
+    pub use flarrow_api::{self, prelude::*};
+    pub use flarrow_file_ext::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

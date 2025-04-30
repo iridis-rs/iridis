@@ -1,5 +1,5 @@
 [package]
-name = "flarrow-file-ext"
+name = "flarrow-file-ext-derive"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true
@@ -13,13 +13,10 @@ license.workspace = true
 repository.workspace = true
 version.workspace = true
 
-[dependencies]
-eyre = { workspace = true }
-tokio = { workspace = true }
-serde_yml = { workspace = true }
-libloading = { workspace = true }
-tracing = { workspace = true }
+[lib]
+proc-macro = true
 
-flarrow-api = { workspace = true }
-flarrow-runtime-core = { workspace = true }
-flarrow-file-ext-derive = { workspace = true }
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }
