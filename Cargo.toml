@@ -28,7 +28,7 @@ categories = []
 documentation = "https://github.com/flarrow/flarrow-rs"
 license = "Apache-2.0"
 repository = "https://github.com/flarrow/flarrow-rs"
-version = "0.3.0"
+version = "0.3.1"
 
 [workspace.dependencies]
 eyre = { version = "0.6", default-features = false, features = [
@@ -65,26 +65,26 @@ tokio = { version = "1", features = [
 tracing = "0.1"
 tracing-subscriber = "0.3"
 
-flarrow-layout = { version = "0.3.0", path = "crates/flarrow-layout" }
+flarrow-layout = { version = "0.3.1", path = "crates/flarrow-layout" }
 
-flarrow-message = { version = "0.3.0", path = "crates/flarrow-message" }
-flarrow-message-derive = { version = "0.3.0", path = "crates/derive/flarrow-message-derive" }
+flarrow-message = { version = "0.3.1", path = "crates/flarrow-message" }
+flarrow-message-derive = { version = "0.3.1", path = "crates/derive/flarrow-message-derive" }
 
-flarrow-api = { version = "0.3.0", path = "crates/flarrow-api" }
-flarrow-api-derive = { version = "0.3.0", path = "crates/derive/flarrow-api-derive" }
+flarrow-api = { version = "0.3.1", path = "crates/flarrow-api" }
+flarrow-api-derive = { version = "0.3.1", path = "crates/derive/flarrow-api-derive" }
 
-flarrow-builtins = { version = "0.3.0", path = "crates/flarrow-builtins" }
+flarrow-builtins = { version = "0.3.1", path = "crates/flarrow-builtins" }
 
-flarrow-flows = { version = "0.3.0", path = "crates/flarrow-flows" }
+flarrow-flows = { version = "0.3.1", path = "crates/flarrow-flows" }
 
-flarrow-runtime-core = { version = "0.3.0", path = "crates/flarrow-runtime-core" }
+flarrow-runtime-core = { version = "0.3.1", path = "crates/flarrow-runtime-core" }
 
-flarrow-file-ext = { version = "0.3.0", path = "crates/plugins/flarrow-file-ext" }
-flarrow-file-ext-derive = { version = "0.3.0", path = "crates/derive/flarrow-file-ext-derive" }
-flarrow-url-scheme = { version = "0.3.0", path = "crates/plugins/flarrow-url-scheme" }
-flarrow-url-scheme-derive = { version = "0.3.0", path = "crates/derive/flarrow-url-scheme-derive" }
+flarrow-file-ext = { version = "0.3.1", path = "crates/plugins/flarrow-file-ext" }
+flarrow-file-ext-derive = { version = "0.3.1", path = "crates/derive/flarrow-file-ext-derive" }
+flarrow-url-scheme = { version = "0.3.1", path = "crates/plugins/flarrow-url-scheme" }
+flarrow-url-scheme-derive = { version = "0.3.1", path = "crates/derive/flarrow-url-scheme-derive" }
 
-flarrow-runtime = { version = "0.3.0", path = "crates/flarrow-runtime" }
+flarrow-runtime = { version = "0.3.1", path = "crates/flarrow-runtime" }
 
 
 [workspace.metadata.release]

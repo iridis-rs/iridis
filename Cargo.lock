@@ -253,7 +253,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-api"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "arrow-array",
  "arrow-data",
@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-api-derive"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -279,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-builtins"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -289,7 +289,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-file-ext"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -303,7 +303,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-file-ext-derive"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -312,7 +312,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-flows"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -325,7 +325,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-layout"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "tokio",
@@ -335,7 +335,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-message"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "arrow-array",
  "arrow-buffer",
@@ -347,7 +347,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-message-derive"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -356,7 +356,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-runtime"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -377,7 +377,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-runtime-core"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -386,7 +386,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-url-scheme"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "eyre",
  "flarrow-api",
@@ -402,7 +402,7 @@ dependencies = [
 
 [[package]]
 name = "flarrow-url-scheme-derive"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "proc-macro2",
  "quote",
