@@ -18,16 +18,16 @@ resolver = "3"
 
 [workspace.package]
 authors = ["Enzo Le Van <dev@enzo-le-van.fr>"]
-description = "flarrow (flow + arrow) is a rust runtime/framework for building dataflow applications."
+description = "The flarrow runtime and api for building and running dataflow applications."
 edition = "2024"
-homepage = "https://github.com/flarrow/flarrow-rs"
+homepage = "https://github.com/flarrow-rs/flarrow-runtime"
 keywords = []
 readme = "README.md"
 rust-version = "1.85"
 categories = []
-documentation = "https://github.com/flarrow/flarrow-rs"
+documentation = "https://github.com/flarrow-rs/flarrow-runtime"
 license = "Apache-2.0"
-repository = "https://github.com/flarrow/flarrow-rs"
+repository = "https://github.com/flarrow-rs/flarrow-runtime"
 version = "0.3.1"
 
 [workspace.dependencies]

@@ -40,10 +40,18 @@ impl UrlSchemePlugin for DefaultUrlSchemePlugin {
                     .load(path, inputs, outputs, queries, queryables, configuration)
                     .await
             }
-            "builtin" => {
-                // TODO!!
-                eyre::bail!("Builtin url scheme is not supported yet!")
-            }
+            "builtin" => Ok(RuntimeNode::StaticallyLinked(
+                new_builtin(
+                    Builtin::from_string(url.path())
+                        .wrap_err(format!("Invalid builtin name '{}'", url.path()))?,
+                    inputs,
+                    outputs,
+                    queries,
+                    queryables,
+                    configuration,
+                )
+                .await?,
+            )),
             _ => Err(eyre::eyre!(
                 "Url scheme '{}' is not supported",
                 url.scheme()

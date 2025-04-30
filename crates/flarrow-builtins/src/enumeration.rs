@@ -12,9 +12,9 @@ impl Builtin {
     /// Creates a new instance of a built-in node from a string.
     pub fn from_string(str: impl AsRef<str>) -> Result<Self> {
         match str.as_ref() {
-            "timer" => Ok(Builtin::Timer),
-            "printer" => Ok(Builtin::Printer),
-            "transport" => Ok(Builtin::Transport),
+            "/timer" => Ok(Builtin::Timer),
+            "/printer" => Ok(Builtin::Printer),
+            "/transport" => Ok(Builtin::Transport),
             _ => Err(eyre::eyre!("Invalid builtin name")),
         }
     }
