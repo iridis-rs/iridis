@@ -25,25 +25,6 @@ impl<T: ArrowMessage, F: ArrowMessage> Queryable<T, F> {
         }
     }
 
-    /// Let the queryable handle a message, converting it from Arrow format, blocking until one is available, don't use it
-    /// in async context
-    pub fn blocking_on_demand(&mut self, response: impl FnOnce(T) -> Result<F>) -> Result<()> {
-        let source = self.raw.source.clone();
-        let layout = self.raw.layout.clone();
-
-        self.raw.blocking_on_demand(move |message| {
-            let result = response(
-                T::try_from_arrow(message.data)
-                    .wrap_err(report_failed_conversion_from_arrow::<T>(&source, &layout))?,
-            )?;
-
-            Ok(result
-                .try_into_arrow()
-                .wrap_err(report_failed_conversion_to_arrow::<F>(&source, &layout))?
-                .into_data())
-        })
-    }
-
     /// Let the queryable handle a message, converting it from Arrow format, asynchrously
     pub async fn on_demand(&mut self, response: impl AsyncFnOnce(T) -> Result<F>) -> Result<()> {
         let source = self.raw.source.clone();

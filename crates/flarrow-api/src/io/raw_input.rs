@@ -19,17 +19,6 @@ impl RawInput {
         Self { rx, source, layout }
     }
 
-    /// Receive a message from the channel, blocking until one is available, don't use it
-    /// in async context
-    pub fn blocking_recv(&mut self) -> Result<(Header, ArrayData)> {
-        let DataflowMessage { header, data } = self
-            .rx
-            .blocking_recv()
-            .ok_or_eyre(report_error_receiving(&self.source, &self.layout))?;
-
-        Ok((header, data))
-    }
-
     /// Receive a message from the channel, asynchronously
     pub async fn recv(&mut self) -> Result<(Header, ArrayData)> {
         let DataflowMessage { header, data } = self

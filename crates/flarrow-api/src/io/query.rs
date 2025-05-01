@@ -25,27 +25,6 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
         }
     }
 
-    /// Query a message from the channel and converting it from Arrow format, blocking until one is available, don't use it
-    /// in async context
-    pub fn blocking_query(&mut self, data: T) -> Result<(Header, F)> {
-        let (header, data) = self.raw.blocking_query(
-            data.try_into_arrow()
-                .wrap_err(report_failed_conversion_to_arrow::<T>(
-                    &self.raw.source,
-                    &self.raw.layout,
-                ))?
-                .into_data(),
-        )?;
-
-        Ok((
-            header,
-            F::try_from_arrow(data).wrap_err(report_failed_conversion_from_arrow::<F>(
-                &self.raw.source,
-                &self.raw.layout,
-            ))?,
-        ))
-    }
-
     /// Query a message from the channel and converting it from Arrow format, asynchronously
     pub async fn query(&mut self, data: T) -> Result<(Header, F)> {
         let (header, data) = self

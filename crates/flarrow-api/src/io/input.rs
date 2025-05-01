@@ -16,21 +16,6 @@ impl<T: ArrowMessage> Input<T> {
         }
     }
 
-    /// Receive a message from the channel and converting it from Arrow format, blocking until one is available, don't use it
-    /// in async context
-    pub fn blocking_recv(&mut self) -> Result<(Header, T)> {
-        let (header, data) = self
-            .raw
-            .blocking_recv()
-            .wrap_err(report_error_receiving(&self.raw.source, &self.raw.layout))?;
-
-        let message = T::try_from_arrow(data).wrap_err(
-            report_failed_conversion_from_arrow::<T>(&self.raw.source, &self.raw.layout),
-        )?;
-
-        Ok((header, message))
-    }
-
     /// Receive a message from the channel and converting it from Arrow format, asyncronously
     pub async fn recv(&mut self) -> Result<(Header, T)> {
         let (header, data) = self

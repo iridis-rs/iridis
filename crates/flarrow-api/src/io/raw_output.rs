@@ -32,46 +32,6 @@ impl RawOutput {
         }
     }
 
-    /// Send a message from the channel, blocking until it's possible, don't use it
-    /// in async context
-    pub fn blocking_send(&self, data: ArrayData) -> Result<()> {
-        let data = DataflowMessage {
-            header: Header {
-                timestamp: self.clock.new_timestamp(),
-                source: (self.source.uuid, self.layout.uuid),
-            },
-            data,
-        };
-
-        let results: Vec<Result<()>> = self
-            .tx
-            .iter()
-            .map(|tx| {
-                tx.blocking_send(data.clone())
-                    .map_err(eyre::Report::msg)
-                    .wrap_err(report_error_sending(&self.source, &self.layout))
-            })
-            .collect();
-
-        if results.iter().all(|r| r.is_ok()) {
-            Ok(())
-        } else {
-            let combined_report: eyre::Report = results
-                .into_iter()
-                .filter(Result::is_err)
-                .map(Result::unwrap_err)
-                .fold(
-                    eyre::eyre!(
-                        "Node '{}' (uuid: {}) encountered multiple errors",
-                        self.source.label,
-                        self.source.uuid
-                    ),
-                    |report, e| e.wrap_err(report),
-                );
-            Err(combined_report)
-        }
-    }
-
     /// Send a message asynchronously to all connected nodes.
     pub async fn send(&self, data: ArrayData) -> Result<()> {
         let data = DataflowMessage {

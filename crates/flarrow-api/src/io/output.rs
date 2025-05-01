@@ -23,19 +23,6 @@ impl<T: ArrowMessage> Output<T> {
         }
     }
 
-    /// Send a message to the output, blocking the current thread until the message is sent.
-    /// Don't use in async context
-    pub fn blocking_send(&self, data: T) -> Result<()> {
-        self.raw.blocking_send(
-            data.try_into_arrow()
-                .wrap_err(report_failed_conversion_to_arrow::<T>(
-                    &self.raw.source,
-                    &self.raw.layout,
-                ))?
-                .into_data(),
-        )
-    }
-
     /// Send a message to the output asynchronously.
     pub async fn send(&self, data: T) -> Result<()> {
         self.raw
