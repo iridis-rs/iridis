@@ -1,33 +1,33 @@
 [workspace]
 members = [
-    "crates/iris-api",
-    "crates/derive/iris-api-derive",
-    "crates/iris-builtins",
-    "crates/iris-layout",
-    "crates/iris-message",
-    "crates/derive/iris-message-derive",
-    "crates/iris-runtime",
-    "crates/iris-flows",
-    "crates/iris-runtime-core",
-    "crates/plugins/iris-url-scheme",
-    "crates/plugins/iris-file-ext",
-    "crates/derive/iris-file-ext-derive",
-    "crates/derive/iris-url-scheme-derive",
+    "crates/iridis-api",
+    "crates/derive/iridis-api-derive",
+    "crates/iridis-builtins",
+    "crates/iridis-layout",
+    "crates/iridis-message",
+    "crates/derive/iridis-message-derive",
+    "crates/iridis-runtime",
+    "crates/iridis-flows",
+    "crates/iridis-runtime-core",
+    "crates/plugins/iridis-url-scheme",
+    "crates/plugins/iridis-file-ext",
+    "crates/derive/iridis-file-ext-derive",
+    "crates/derive/iridis-url-scheme-derive",
 ]
 resolver = "3"
 
 [workspace.package]
 authors = ["Enzo Le Van <dev@enzo-le-van.fr>"]
-description = "The iris runtime and api for building and running dataflow applications."
+description = "The iridis runtime and api for building and running dataflow applications."
 edition = "2024"
-homepage = "https://github.com/iris-rs/iris-runtime"
+homepage = "https://github.com/iridis-rs/iridis-runtime"
 keywords = []
 readme = "README.md"
 rust-version = "1.85"
 categories = []
-documentation = "https://github.com/iris-rs/iris-runtime"
+documentation = "https://github.com/iridis-rs/iridis-runtime"
 license = "Apache-2.0"
-repository = "https://github.com/iris-rs/iris-runtime"
+repository = "https://github.com/iridis-rs/iridis-runtime"
 version = "0.3.1"
 
 [workspace.dependencies]
@@ -65,26 +65,26 @@ tokio = { version = "1", features = [
 tracing = "0.1"
 tracing-subscriber = "0.3"
 
-iris-layout = { version = "0.3.1", path = "crates/iris-layout" }
+iridis-layout = { version = "0.3.1", path = "crates/iridis-layout" }
 
-iris-message = { version = "0.3.1", path = "crates/iris-message" }
-iris-message-derive = { version = "0.3.1", path = "crates/derive/iris-message-derive" }
+iridis-message = { version = "0.3.1", path = "crates/iridis-message" }
+iridis-message-derive = { version = "0.3.1", path = "crates/derive/iridis-message-derive" }
 
-iris-api = { version = "0.3.1", path = "crates/iris-api" }
-iris-api-derive = { version = "0.3.1", path = "crates/derive/iris-api-derive" }
+iridis-api = { version = "0.3.1", path = "crates/iridis-api" }
+iridis-api-derive = { version = "0.3.1", path = "crates/derive/iridis-api-derive" }
 
-iris-builtins = { version = "0.3.1", path = "crates/iris-builtins" }
+iridis-builtins = { version = "0.3.1", path = "crates/iridis-builtins" }
 
-iris-flows = { version = "0.3.1", path = "crates/iris-flows" }
+iridis-flows = { version = "0.3.1", path = "crates/iridis-flows" }
 
-iris-runtime-core = { version = "0.3.1", path = "crates/iris-runtime-core" }
+iridis-runtime-core = { version = "0.3.1", path = "crates/iridis-runtime-core" }
 
-iris-file-ext = { version = "0.3.1", path = "crates/plugins/iris-file-ext" }
-iris-file-ext-derive = { version = "0.3.1", path = "crates/derive/iris-file-ext-derive" }
-iris-url-scheme = { version = "0.3.1", path = "crates/plugins/iris-url-scheme" }
-iris-url-scheme-derive = { version = "0.3.1", path = "crates/derive/iris-url-scheme-derive" }
+iridis-file-ext = { version = "0.3.1", path = "crates/plugins/iridis-file-ext" }
+iridis-file-ext-derive = { version = "0.3.1", path = "crates/derive/iridis-file-ext-derive" }
+iridis-url-scheme = { version = "0.3.1", path = "crates/plugins/iridis-url-scheme" }
+iridis-url-scheme-derive = { version = "0.3.1", path = "crates/derive/iridis-url-scheme-derive" }
 
-iris-runtime = { version = "0.3.1", path = "crates/iris-runtime" }
+iridis-runtime = { version = "0.3.1", path = "crates/iridis-runtime" }
 
 
 [workspace.metadata.release]

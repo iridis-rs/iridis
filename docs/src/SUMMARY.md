@@ -1,6 +1,6 @@
 # Summary
 
-- [`iris-runtime`](./iris-runtime.md)
+- [`iridis-runtime`](./iridis-runtime.md)
 
 - [Getting Started](./getting-started.md)
   - [Installation](./installation.md)
@@ -8,4 +8,4 @@
 
 - [Examples](./examples.md)
 
-- [`iris-rs`](./organization.md)
+- [`iridis-rs`](./organization.md)

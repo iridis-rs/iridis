@@ -1,0 +1,25 @@
+[package]
+name = "iridis-file-ext"
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+readme.workspace = true
+rust-version.workspace = true
+categories.workspace = true
+documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+eyre = { workspace = true }
+tokio = { workspace = true }
+serde_yml = { workspace = true }
+libloading = { workspace = true }
+tracing = { workspace = true }
+
+iridis-api = { workspace = true }
+iridis-runtime-core = { workspace = true }
+iridis-file-ext-derive = { workspace = true }

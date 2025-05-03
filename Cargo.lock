@@ -496,15 +496,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-api"
+name = "iridis-api"
 version = "0.3.1"
 dependencies = [
  "arrow-array",
  "arrow-data",
  "eyre",
- "iris-api-derive",
- "iris-layout",
- "iris-message",
+ "iridis-api-derive",
+ "iridis-layout",
+ "iridis-message",
  "serde_yml",
  "tokio",
  "tracing",
@@ -513,7 +513,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-api-derive"
+name = "iridis-api-derive"
 version = "0.3.1"
 dependencies = [
  "proc-macro2",
@@ -522,23 +522,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-builtins"
+name = "iridis-builtins"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
+ "iridis-api",
  "serde_yml",
  "tokio",
 ]
 
 [[package]]
-name = "iris-file-ext"
+name = "iridis-file-ext"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
- "iris-file-ext-derive",
- "iris-runtime-core",
+ "iridis-api",
+ "iridis-file-ext-derive",
+ "iridis-runtime-core",
  "libloading",
  "serde_yml",
  "tokio",
@@ -546,7 +546,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-file-ext-derive"
+name = "iridis-file-ext-derive"
 version = "0.3.1"
 dependencies = [
  "proc-macro2",
@@ -555,12 +555,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-flows"
+name = "iridis-flows"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
- "iris-layout",
+ "iridis-api",
+ "iridis-layout",
  "tokio",
  "tracing",
  "uhlc",
@@ -568,7 +568,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-layout"
+name = "iridis-layout"
 version = "0.3.1"
 dependencies = [
  "eyre",
@@ -578,7 +578,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-message"
+name = "iridis-message"
 version = "0.3.1"
 dependencies = [
  "arrow-array",
@@ -586,11 +586,11 @@ dependencies = [
  "arrow-data",
  "arrow-schema",
  "eyre",
- "iris-message-derive",
+ "iridis-message-derive",
 ]
 
 [[package]]
-name = "iris-message-derive"
+name = "iridis-message-derive"
 version = "0.3.1"
 dependencies = [
  "proc-macro2",
@@ -599,17 +599,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-runtime"
+name = "iridis-runtime"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
- "iris-builtins",
- "iris-file-ext",
- "iris-flows",
- "iris-layout",
- "iris-runtime-core",
- "iris-url-scheme",
+ "iridis-api",
+ "iridis-builtins",
+ "iridis-file-ext",
+ "iridis-flows",
+ "iridis-layout",
+ "iridis-runtime-core",
+ "iridis-url-scheme",
  "libloading",
  "serde_yml",
  "tokio",
@@ -620,23 +620,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-runtime-core"
+name = "iridis-runtime-core"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
+ "iridis-api",
  "libloading",
 ]
 
 [[package]]
-name = "iris-url-scheme"
+name = "iridis-url-scheme"
 version = "0.3.1"
 dependencies = [
  "eyre",
- "iris-api",
- "iris-file-ext",
- "iris-runtime-core",
- "iris-url-scheme-derive",
+ "iridis-api",
+ "iridis-file-ext",
+ "iridis-runtime-core",
+ "iridis-url-scheme-derive",
  "libloading",
  "serde_yml",
  "tokio",
@@ -645,7 +645,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "iris-url-scheme-derive"
+name = "iridis-url-scheme-derive"
 version = "0.3.1"
 dependencies = [
  "proc-macro2",

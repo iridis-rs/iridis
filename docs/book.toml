@@ -3,4 +3,4 @@ authors = ["Enzo Le Van"]
 language = "en"
 multilingual = false
 src = "src"
-title = "iris-runtime"
+title = "iridis-runtime"

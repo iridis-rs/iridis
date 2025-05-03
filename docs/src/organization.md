@@ -1,1 +1,1 @@
-# [`iris-rs`](https://iris-rs.github.io/)
+# [`iridis-rs`](https://iridis-rs.github.io/)
