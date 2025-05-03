@@ -1,0 +1,37 @@
+[package]
+name = "iris-runtime"
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+readme.workspace = true
+rust-version.workspace = true
+categories.workspace = true
+documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[features]
+cdylib = []
+
+[dependencies]
+eyre = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+uhlc = { workspace = true }
+serde_yml = { workspace = true }
+libloading = { workspace = true }
+
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+iris-api = { workspace = true }
+iris-runtime-core = { workspace = true }
+iris-flows = { workspace = true }
+iris-builtins = { workspace = true }
+
+iris-file-ext = { workspace = true }
+iris-url-scheme = { workspace = true }
+iris-layout = { workspace = true }

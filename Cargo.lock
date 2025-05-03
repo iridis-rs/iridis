@@ -25,7 +25,7 @@ checksum = "e89da841a80418a9b391ebaea17f5c112ffaaa96f621d2c285b5174da76b9011"
 dependencies = [
  "cfg-if",
  "const-random",
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "once_cell",
  "version_check",
  "zerocopy",
@@ -48,15 +48,15 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.97"
+version = "1.0.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcfed56ad506cb2c684a14971b8861fdc3baaaae314b9e5f9bb532cbe3ba7a4f"
+checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
 
 [[package]]
 name = "arrow-array"
-version = "54.3.1"
+version = "55.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12fcdb3f1d03f69d3ec26ac67645a8fe3f878d77b5ebb0b15d64a116c212985"
+checksum = "cebfe926794fbc1f49ddd0cdaf898956ca9f6e79541efce62dabccfd81380472"
 dependencies = [
  "ahash",
  "arrow-buffer",
@@ -70,9 +70,9 @@ dependencies = [
 
 [[package]]
 name = "arrow-buffer"
-version = "54.3.1"
+version = "55.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "263f4801ff1839ef53ebd06f99a56cecd1dbaf314ec893d93168e2e860e0291c"
+checksum = "0303c7ec4cf1a2c60310fc4d6bbc3350cd051a17bf9e9c0a8e47b4db79277824"
 dependencies = [
  "bytes",
  "half",
@@ -81,9 +81,9 @@ dependencies = [
 
 [[package]]
 name = "arrow-data"
-version = "54.3.1"
+version = "55.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61cfdd7d99b4ff618f167e548b2411e5dd2c98c0ddebedd7df433d34c20a4429"
+checksum = "e8affacf3351a24039ea24adab06f316ded523b6f8c3dbe28fbac5f18743451b"
 dependencies = [
  "arrow-buffer",
  "arrow-schema",
@@ -93,9 +93,9 @@ dependencies = [
 
 [[package]]
 name = "arrow-schema"
-version = "54.3.1"
+version = "55.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39cfaf5e440be44db5413b75b72c2a87c1f8f0627117d110264048f2969b99e9"
+checksum = "7450c76ab7c5a6805be3440dc2e2096010da58f7cab301fdc996a4ee3ee74e49"
 
 [[package]]
 name = "autocfg"
@@ -147,9 +147,9 @@ checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
 name = "cc"
-version = "1.2.18"
+version = "1.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "525046617d8376e3db1deffb079e91cef90a89fc3ca5c185bbf8c9ecdd15cd5c"
+checksum = "8691782945451c1c383942c4874dbe63814f61cb57ef773cda2972682b7bb3c0"
 dependencies = [
  "shlex",
 ]
@@ -162,9 +162,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
-version = "0.4.40"
+version = "0.4.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a7964611d71df112cb1730f2ee67324fcf4d0fc6606acbbe9bfe06df124637c"
+checksum = "c469d952047f47f91b68d1cba3f10d63c11d73e4636f24f08daf0278abf01c4d"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
@@ -187,7 +187,7 @@ version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9d839f2a20b0aee515dc581a6172f2321f96cab76c1a38a4c584a194955390e"
 dependencies = [
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
  "once_cell",
  "tiny-keccak",
 ]
@@ -252,164 +252,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "flarrow-api"
-version = "0.3.1"
-dependencies = [
- "arrow-array",
- "arrow-data",
- "eyre",
- "flarrow-api-derive",
- "flarrow-layout",
- "flarrow-message",
- "serde_yml",
- "tokio",
- "tracing",
- "uhlc",
- "uuid",
-]
-
-[[package]]
-name = "flarrow-api-derive"
-version = "0.3.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "flarrow-builtins"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "serde_yml",
- "tokio",
-]
-
-[[package]]
-name = "flarrow-file-ext"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "flarrow-file-ext-derive",
- "flarrow-runtime-core",
- "libloading",
- "serde_yml",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "flarrow-file-ext-derive"
-version = "0.3.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "flarrow-flows"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "flarrow-layout",
- "tokio",
- "tracing",
- "uhlc",
- "uuid",
-]
-
-[[package]]
-name = "flarrow-layout"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "flarrow-message"
-version = "0.3.1"
-dependencies = [
- "arrow-array",
- "arrow-buffer",
- "arrow-data",
- "arrow-schema",
- "eyre",
- "flarrow-message-derive",
-]
-
-[[package]]
-name = "flarrow-message-derive"
-version = "0.3.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "flarrow-runtime"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "flarrow-builtins",
- "flarrow-file-ext",
- "flarrow-flows",
- "flarrow-layout",
- "flarrow-runtime-core",
- "flarrow-url-scheme",
- "libloading",
- "serde_yml",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uhlc",
- "url",
-]
-
-[[package]]
-name = "flarrow-runtime-core"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "libloading",
-]
-
-[[package]]
-name = "flarrow-url-scheme"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "flarrow-api",
- "flarrow-file-ext",
- "flarrow-runtime-core",
- "flarrow-url-scheme-derive",
- "libloading",
- "serde_yml",
- "tokio",
- "tracing",
- "url",
-]
-
-[[package]]
-name = "flarrow-url-scheme-derive"
-version = "0.3.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "form_urlencoded"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -430,9 +272,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.2.15"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
+checksum = "335ff9f135e4384c8150d6f27c6daed433577f86b4750418338c01a1a2528592"
 dependencies = [
  "cfg-if",
  "libc",
@@ -470,9 +312,9 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.15.2"
+version = "0.15.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
+checksum = "84b26c544d002229e640969970a2e74021aadf6e2f96372b9c58eff97de08eb3"
 
 [[package]]
 name = "iana-time-zone"
@@ -654,6 +496,164 @@ dependencies = [
 ]
 
 [[package]]
+name = "iris-api"
+version = "0.3.1"
+dependencies = [
+ "arrow-array",
+ "arrow-data",
+ "eyre",
+ "iris-api-derive",
+ "iris-layout",
+ "iris-message",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "uhlc",
+ "uuid",
+]
+
+[[package]]
+name = "iris-api-derive"
+version = "0.3.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "iris-builtins"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "serde_yml",
+ "tokio",
+]
+
+[[package]]
+name = "iris-file-ext"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "iris-file-ext-derive",
+ "iris-runtime-core",
+ "libloading",
+ "serde_yml",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "iris-file-ext-derive"
+version = "0.3.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "iris-flows"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "iris-layout",
+ "tokio",
+ "tracing",
+ "uhlc",
+ "uuid",
+]
+
+[[package]]
+name = "iris-layout"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "iris-message"
+version = "0.3.1"
+dependencies = [
+ "arrow-array",
+ "arrow-buffer",
+ "arrow-data",
+ "arrow-schema",
+ "eyre",
+ "iris-message-derive",
+]
+
+[[package]]
+name = "iris-message-derive"
+version = "0.3.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "iris-runtime"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "iris-builtins",
+ "iris-file-ext",
+ "iris-flows",
+ "iris-layout",
+ "iris-runtime-core",
+ "iris-url-scheme",
+ "libloading",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uhlc",
+ "url",
+]
+
+[[package]]
+name = "iris-runtime-core"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "libloading",
+]
+
+[[package]]
+name = "iris-url-scheme"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iris-api",
+ "iris-file-ext",
+ "iris-runtime-core",
+ "iris-url-scheme-derive",
+ "libloading",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "iris-url-scheme-derive"
+version = "0.3.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -677,9 +677,9 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
-version = "0.2.171"
+version = "0.2.172"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c19937216e9d3aa9956d9bb8dfc0b0c8beb6058fc4f7a4dc4d850edf86a237d6"
+checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
 
 [[package]]
 name = "libloading"
@@ -693,9 +693,9 @@ dependencies = [
 
 [[package]]
 name = "libm"
-version = "0.2.11"
+version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8355be11b20d696c8f18f6cc018c4e372165b1fa8126cef092399c9951984ffa"
+checksum = "c9627da5196e5d8ed0b0495e61e518847578da83483c37288316d9b2e03a7f72"
 
 [[package]]
 name = "libyml"
@@ -737,9 +737,9 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
 name = "miniz_oxide"
-version = "0.8.7"
+version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff70ce3e48ae43fa075863cef62e8b43b71a4f2382229920e0df362592919430"
+checksum = "3be647b768db090acb35d5ec5db2b0e1f1de11133ca123b9eacf5137868f892a"
 dependencies = [
  "adler2",
 ]
@@ -874,9 +874,9 @@ checksum = "3b3cff922bd51709b605d9ead9aa71031d81447142d828eb4a6eba76fe619f9b"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a31971752e70b8b2686d7e46ec17fb38dad4051d94024c88df49b667caea9c84"
+checksum = "02b3e5e68a3a1a02aad3ec490a98007cbc13c37cbe84a3cd7b8e406d76e7f778"
 dependencies = [
  "unicode-ident",
 ]
@@ -911,7 +911,7 @@ version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
- "getrandom 0.2.15",
+ "getrandom 0.2.16",
 ]
 
 [[package]]
@@ -984,9 +984,9 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "signal-hook-registry"
-version = "1.4.2"
+version = "1.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9e9e0b4211b72e7b8b6e85c807d36c212bdb33ea8587f7569562a84df5465b1"
+checksum = "9203b8055f63a2a00e2f593bb0510367fe707d7ff1e5c872de2f537b339e5410"
 dependencies = [
  "libc",
 ]
@@ -1011,9 +1011,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "syn"
-version = "2.0.100"
+version = "2.0.101"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b09a44accad81e1ba1cd74a32461ba89dee89095ba17b32f5d03683b1b1fc2a0"
+checksum = "8ce2b7fc941b3a24138a0a7cf8e858bfc6a992e7978a068a5c760deb0ed43caf"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1022,9 +1022,9 @@ dependencies = [
 
 [[package]]
 name = "synstructure"
-version = "0.13.1"
+version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8af7666ab7b6390ab78131fb5b0fce11d6b7a6951602017c35fa82800708971"
+checksum = "728a70f3dbaf5bab7f0c4b1ac8d7ae5ea60a4b5549c8a5914361c99147a709d2"
 dependencies = [
  "proc-macro2",
  "quote",

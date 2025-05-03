@@ -1,6 +1,6 @@
 # Summary
 
-- [`flarrow-runtime`](./flarrow-runtime.md)
+- [`iris-runtime`](./iris-runtime.md)
 
 - [Getting Started](./getting-started.md)
   - [Installation](./installation.md)
@@ -8,4 +8,4 @@
 
 - [Examples](./examples.md)
 
-- [`flarrow-rs`](./organization.md)
+- [`iris-rs`](./organization.md)

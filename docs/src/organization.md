@@ -1,1 +1,1 @@
-# [`flarrow-rs`](https://flarrow-rs.github.io/)
+# [`iris-rs`](https://iris-rs.github.io/)
