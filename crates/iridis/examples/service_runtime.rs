@@ -1,4 +1,4 @@
-use iridis_runtime::prelude::{thirdparty::*, *};
+use iridis::prelude::{thirdparty::*, *};
 
 #[tokio::main]
 async fn main() -> Result<()> {

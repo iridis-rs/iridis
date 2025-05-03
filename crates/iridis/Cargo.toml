@@ -1,5 +1,5 @@
 [package]
-name = "iridis-runtime"
+name = "iridis"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true

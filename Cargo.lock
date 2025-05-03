@@ -496,6 +496,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "iridis"
+version = "0.3.1"
+dependencies = [
+ "eyre",
+ "iridis-api",
+ "iridis-builtins",
+ "iridis-file-ext",
+ "iridis-flows",
+ "iridis-layout",
+ "iridis-runtime-core",
+ "iridis-url-scheme",
+ "libloading",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uhlc",
+ "url",
+]
+
+[[package]]
 name = "iridis-api"
 version = "0.3.1"
 dependencies = [
@@ -596,27 +617,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "iridis-runtime"
-version = "0.3.1"
-dependencies = [
- "eyre",
- "iridis-api",
- "iridis-builtins",
- "iridis-file-ext",
- "iridis-flows",
- "iridis-layout",
- "iridis-runtime-core",
- "iridis-url-scheme",
- "libloading",
- "serde_yml",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uhlc",
- "url",
 ]
 
 [[package]]
