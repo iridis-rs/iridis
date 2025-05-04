@@ -18,16 +18,16 @@ resolver = "3"
 
 [workspace.package]
 authors = ["Enzo Le Van <dev@enzo-le-van.fr>"]
-description = "The iridis runtime and api for building and running dataflow applications."
+description = "iridis is a framework that lets you define and build dataflow applications with ease."
 edition = "2024"
-homepage = "https://github.com/iridis-rs/iridis-runtime"
+homepage = "https://github.com/iridis-rs/iridis"
 keywords = []
 readme = "README.md"
 rust-version = "1.85"
 categories = []
-documentation = "https://github.com/iridis-rs/iridis-runtime"
+documentation = "https://github.com/iridis-rs/iridis"
 license = "Apache-2.0"
-repository = "https://github.com/iridis-rs/iridis-runtime"
+repository = "https://github.com/iridis-rs/iridis"
 version = "0.3.1"
 
 [workspace.dependencies]
