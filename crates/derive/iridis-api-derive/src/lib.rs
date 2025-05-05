@@ -3,10 +3,10 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
+    DeriveInput, ImplItem, ItemImpl, ReturnType, Token,
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
-    DeriveInput, ImplItem, ItemImpl, ReturnType, Token,
 };
 
 #[proc_macro_derive(Node)]
@@ -18,7 +18,7 @@ pub fn derive_node(input: TokenStream) -> TokenStream {
         #[cfg(feature = "cdylib")]
         #[doc(hidden)]
         #[unsafe(no_mangle)]
-        pub static iridis_NODE: iridis_api::prelude::DynamicallyLinkedNodeInstance = |inputs, outputs, queries, queryables, configuration| {
+        pub static IRIDIS_NODE: iridis_api::prelude::DynamicallyLinkedNodeInstance = |inputs, outputs, queries, queryables, configuration| {
             <#name>::new(inputs, outputs, queries, queryables, configuration)
         };
 

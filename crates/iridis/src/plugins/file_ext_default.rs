@@ -38,9 +38,9 @@ impl FileExtPlugin for DefaultFileExtPlugin {
 
                         let constructor = unsafe {
                             library
-                                .get::<*mut DynamicallyLinkedNodeInstance>(b"iridis_NODE")
+                                .get::<*mut DynamicallyLinkedNodeInstance>(b"IRIDIS_NODE")
                                 .wrap_err(format!(
-                                    "Failed to load symbol 'iridis_NODE' from dylib {:?}",
+                                    "Failed to load symbol 'IRIDIS_NODE' from dylib {:?}",
                                     path_buf
                                 ))?
                                 .read()

@@ -90,10 +90,10 @@ impl UrlSchemeManagerBuilder {
                             let constructor = unsafe {
                                 library
                                 .get::<*mut DynamicallyLinkedUrlSchemePluginInstance>(
-                                    b"iridis_URL_SCHEME_PLUGIN",
+                                    b"IRIDIS_URL_SCHEME_PLUGIN",
                                 )
                                 .wrap_err(format!(
-                                    "Failed to load symbol 'iridis_URL_SCHEME_PLUGIN' from cdylib {:?}",
+                                    "Failed to load symbol 'IRIDIS_URL_SCHEME_PLUGIN' from cdylib {:?}",
                                     path_buf
                                 ))?
                                 .read()

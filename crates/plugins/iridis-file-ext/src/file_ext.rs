@@ -84,10 +84,10 @@ impl FileExtManagerBuilder {
                         let constructor = unsafe {
                             library
                                 .get::<*mut DynamicallyLinkedFileExtPluginInstance>(
-                                    b"iridis_FILE_EXT_PLUGIN",
+                                    b"IRIDIS_FILE_EXT_PLUGIN",
                                 )
                                 .wrap_err(format!(
-                                    "Failed to load symbol 'iridis_FILE_EXT_PLUGIN' from cdylib {:?}",
+                                    "Failed to load symbol 'IRIDIS_FILE_EXT_PLUGIN' from cdylib {:?}",
                                     path_buf
                                 ))?
                                 .read()

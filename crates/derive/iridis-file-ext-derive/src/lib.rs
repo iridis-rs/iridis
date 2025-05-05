@@ -3,10 +3,10 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
+    DeriveInput, ImplItem, ItemImpl, ReturnType, Token,
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
-    DeriveInput, ImplItem, ItemImpl, ReturnType, Token,
 };
 
 #[proc_macro_derive(FileExtPlugin)]
@@ -18,7 +18,7 @@ pub fn derive_file_ext_plugin(input: TokenStream) -> TokenStream {
         #[cfg(feature = "cdylib")]
         #[doc(hidden)]
         #[unsafe(no_mangle)]
-        pub static iridis_FILE_EXT_PLUGIN: DynamicallyLinkedFileExtPluginInstance =
+        pub static IRIDIS_FILE_EXT_PLUGIN: DynamicallyLinkedFileExtPluginInstance =
             || <#name>::new();
 
         static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<iridis_file_ext::prelude::thirdparty::tokio::runtime::Runtime> =
