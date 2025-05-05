@@ -89,3 +89,4 @@ iridis = { version = "0.3.1", path = "crates/iridis-runtime" }
 
 [workspace.metadata.release]
 rate-limit.new-packages = 10
+tag = false
