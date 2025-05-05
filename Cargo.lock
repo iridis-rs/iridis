@@ -497,7 +497,7 @@ dependencies = [
 
 [[package]]
 name = "iridis"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -518,7 +518,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-api"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "arrow-array",
  "arrow-data",
@@ -535,7 +535,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-api-derive"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -544,7 +544,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-builtins"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -554,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-file-ext"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -568,7 +568,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-file-ext-derive"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -577,7 +577,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-flows"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -590,7 +590,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-layout"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "tokio",
@@ -600,7 +600,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-message"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "arrow-array",
  "arrow-buffer",
@@ -612,7 +612,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-message-derive"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -621,7 +621,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-runtime-core"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -630,7 +630,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-url-scheme"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eyre",
  "iridis-api",
@@ -646,7 +646,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-url-scheme-derive"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "proc-macro2",
  "quote",
