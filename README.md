@@ -1,22 +1,22 @@
 # `iridis`
 
-`iridis` is a framework that lets you define and build dataflow applications with ease.
+`iridis` is a framework that allows you to define and build dataflow applications with ease.
 
-It consists on 2 APIs:
+It consists of two main APIs:
 
-- `iridis-api`: the main API for implementing each node in the dataflow graph.
-- `iridis`: the `runtime` API that will load all the nodes and launch the application.
+* `iridis-api`: the primary API used to implement each node in the dataflow graph.
+* `iridis`: the `runtime` API responsible for loading all nodes and launching the application.
 
-Additionally we provide 2 other APIs:
+In addition, we provide two plugin APIs:
 
-- `iridis-file-ext`: the Plugin API for handling file extensions (it defines how the runtime should load a file with a specific extension).
-- `iridis-url-scheme`: the Plugin API for handling URL schemes (it defines how the runtime should load an url with a specific URL scheme).
+* `iridis-file-ext`: the plugin API for handling file extensions. It defines how the runtime should load files with specific extensions.
+* `iridis-url-scheme`: the plugin API for handling URL schemes. It defines how the runtime should load URLs with specific schemes.
 
-Each plugin can be loaded into the `iridis` runtime uppon initialization.
+Each plugin can be loaded into the `iridis` runtime upon initialization.
 
 ## Usage
 
-In a `lib` crate we can define a `node`:
+In a `lib` crate, you can define a `node` like this:
 
 ```rust
 use iridis_api::prelude::{thirdparty::*, *};
@@ -50,7 +50,7 @@ impl Node for MySink {
 }
 ```
 
-Then we can create a `layout` and the `flows` that apply to the application:
+Next, create a `layout` and define the `flows` for the application:
 
 ```rust
 use iridis::prelude::{thirdparty::*, *};
@@ -91,7 +91,7 @@ async fn main() -> Result<()> {
 }
 ```
 
-And finally we can create a Runtime, load all our plugins, and for each node in the layout, we can load a `node implementation`:
+Finally, create a runtime, load your plugins, and load a `node implementation` for each node in the layout:
 
 ```rust
 let runtime = Runtime::new(
@@ -121,19 +121,18 @@ runtime
 }
 ```
 
-In this example we load 3 nodes as statically linked libraries. But it's possible to load a node dynamically from an URL. The node must have been
-compiled as a `cdylib` with the feature flag `cdylib` enabled.
+In this example, three nodes are loaded as statically linked libraries. However, it’s also possible to load a node dynamically from a URL. The node must be compiled as a `cdylib` with the `cdylib` feature flag enabled:
 
 ```rust
 loader.load_url(Url::parse("file:///path/to/timer.so")?, source, serde_yml::from_str("frequency: 1.0")?)
     .await?;
 ```
 
-See [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark) for a complete example of a project with multiple nodes, both statically linked and dynamically loaded.
+For a complete example of a project with multiple nodes—both statically linked and dynamically loaded—see [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark).
 
 ## Benchmark
 
-See [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark) for a full description of the benchmark.
+See [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark) for a detailed description of the benchmark.
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/iridis-rs/iridis-benchmark/main/bench/benchmark_latency.svg" alt="Benchmark Latency">
