@@ -130,6 +130,11 @@ loader.load_url(Url::parse("file:///path/to/timer.so")?, source, serde_yml::from
 
 For a complete example of a project with multiple nodes—both statically linked and dynamically loaded—see [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark).
 
+## Python
+
+It's possible to write your nodes in python. You will need to add the `PythonFileExt` plugin into your runtime to be able to load a `.py` file. See
+[pyridis](https://github.com/iridis-rs/pyridis) for a detailed description of the python support.
+
 ## Benchmark
 
 See [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark) for a detailed description of the benchmark.

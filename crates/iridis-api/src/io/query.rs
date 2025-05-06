@@ -27,7 +27,7 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
 
     /// Query a message from the channel and converting it from Arrow format, asynchronously
     pub async fn query(&mut self, data: T) -> Result<(Header, F)> {
-        let (header, data) = self
+        let DataflowMessage { header, data } = self
             .raw
             .query(
                 data.try_into_arrow()

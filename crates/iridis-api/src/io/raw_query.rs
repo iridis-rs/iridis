@@ -37,7 +37,7 @@ impl RawQuery {
     }
 
     /// Query a message to a queryable
-    pub async fn query(&mut self, data: ArrayData) -> Result<(Header, ArrayData)> {
+    pub async fn query(&mut self, data: ArrayData) -> Result<DataflowMessage> {
         let data = DataflowMessage {
             header: Header {
                 timestamp: self.clock.new_timestamp(),
@@ -51,12 +51,12 @@ impl RawQuery {
             .await
             .wrap_err(report_error_sending(&self.source, &self.layout))?;
 
-        let DataflowMessage { header, data } = self
+        let message = self
             .rx
             .recv()
             .await
             .ok_or_eyre(report_error_receiving(&self.source, &self.layout))?;
 
-        Ok((header, data))
+        Ok(message)
     }
 }

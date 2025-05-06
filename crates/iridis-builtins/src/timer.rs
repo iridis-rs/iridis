@@ -30,13 +30,15 @@ impl Node for Timer {
     }
 
     async fn start(self: Box<Self>) -> Result<()> {
-        loop {
-            self.output
-                .send("tick".to_string())
-                .await
-                .wrap_err("Failed to send message")?;
-
+        while let Ok(()) = self
+            .output
+            .send("tick".to_string())
+            .await
+            .wrap_err("Failed to send message")
+        {
             tokio::time::sleep(Duration::from_millis((1000.0 / self.frequency) as u64)).await;
         }
+
+        Ok(())
     }
 }

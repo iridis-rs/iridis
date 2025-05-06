@@ -37,10 +37,12 @@ impl RawQueryable {
     }
 
     /// Let the queryable handle a message asynchronously
-    pub async fn on_demand(
+    pub async fn on_query(
         &mut self,
         response: impl AsyncFnOnce(DataflowMessage) -> Result<ArrayData>,
     ) -> Result<()> {
+        // TODO: should this be DataflowMessage? If yes then for typed queryable should this
+        // be something else?
         let message = self
             .rx
             .recv()

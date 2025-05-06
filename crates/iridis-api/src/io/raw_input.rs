@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use thirdparty::arrow_data::ArrayData;
 
 /// Not typed Input to receive data from the dataflow
 #[derive(Debug)]
@@ -20,13 +19,13 @@ impl RawInput {
     }
 
     /// Receive a message from the channel, asynchronously
-    pub async fn recv(&mut self) -> Result<(Header, ArrayData)> {
-        let DataflowMessage { header, data } = self
+    pub async fn recv(&mut self) -> Result<DataflowMessage> {
+        let message = self
             .rx
             .recv()
             .await
             .ok_or_eyre(report_error_receiving(&self.source, &self.layout))?;
 
-        Ok((header, data))
+        Ok(message)
     }
 }

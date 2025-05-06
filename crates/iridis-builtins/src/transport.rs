@@ -23,7 +23,7 @@ impl Node for Transport {
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
-        while let Ok((_, data)) = self.input.recv().await {
+        while let Ok(DataflowMessage { header: _, data }) = self.input.recv().await {
             self.output.send(data).await?;
         }
 

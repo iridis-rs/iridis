@@ -18,7 +18,7 @@ impl<T: ArrowMessage> Input<T> {
 
     /// Receive a message from the channel and converting it from Arrow format, asyncronously
     pub async fn recv(&mut self) -> Result<(Header, T)> {
-        let (header, data) = self
+        let DataflowMessage { header, data } = self
             .raw
             .recv()
             .await

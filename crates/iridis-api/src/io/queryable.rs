@@ -26,12 +26,12 @@ impl<T: ArrowMessage, F: ArrowMessage> Queryable<T, F> {
     }
 
     /// Let the queryable handle a message, converting it from Arrow format, asynchrously
-    pub async fn on_demand(&mut self, response: impl AsyncFnOnce(T) -> Result<F>) -> Result<()> {
+    pub async fn on_query(&mut self, response: impl AsyncFnOnce(T) -> Result<F>) -> Result<()> {
         let source = self.raw.source.clone();
         let layout = self.raw.layout.clone();
 
         self.raw
-            .on_demand(async move |message| {
+            .on_query(async move |message| {
                 let result = response(
                     T::try_from_arrow(message.data)
                         .wrap_err(report_failed_conversion_from_arrow::<T>(&source, &layout))?,
