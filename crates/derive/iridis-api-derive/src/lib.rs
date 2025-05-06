@@ -85,7 +85,7 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ReturnType::Default => quote! { () },
                     ReturnType::Type(_, ty) => {
                         if method.sig.ident == "new" {
-                            quote! { iridis_api::prelude::thirdparty::eyre::Result<Box<dyn Node>> }
+                            quote! { iridis_api::prelude::thirdparty::eyre::Result<Box<dyn iridis_api::prelude::Node>> }
                         } else {
                             quote! { #ty }
                         }
@@ -100,7 +100,7 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
                     method.block = syn::parse_quote! {
                         {
                             #runtime_tokens(async move {
-                                #old_block.map(|node| Box::new(node) as Box<dyn Node>)
+                                #old_block.map(|node| Box::new(node) as Box<dyn iridis_api::prelude::Node>)
                             })
                         }
                     };

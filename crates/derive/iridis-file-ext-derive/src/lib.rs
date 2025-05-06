@@ -86,7 +86,7 @@ pub fn file_ext_plugin(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ReturnType::Default => quote! { () },
                     ReturnType::Type(_, ty) => {
                         if method.sig.ident == "new" {
-                            quote! { iridis_file_ext::prelude::thirdparty::eyre::Result<Box<dyn FileExtPlugin>> }
+                            quote! { iridis_file_ext::prelude::thirdparty::eyre::Result<Box<dyn iridis_file_ext::prelude::FileExtPlugin>> }
                         } else {
                             quote! { #ty }
                         }
@@ -101,7 +101,7 @@ pub fn file_ext_plugin(attr: TokenStream, item: TokenStream) -> TokenStream {
                     method.block = syn::parse_quote! {
                         {
                             #runtime_tokens(async move {
-                                #old_block.map(|node| Box::new(node) as Box<dyn FileExtPlugin>)
+                                #old_block.map(|node| Box::new(node) as Box<dyn iridis_file_ext::prelude::FileExtPlugin>)
                             })
                         }
                     };

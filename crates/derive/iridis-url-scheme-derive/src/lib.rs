@@ -86,7 +86,7 @@ pub fn url_scheme_plugin(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ReturnType::Default => quote! { () },
                     ReturnType::Type(_, ty) => {
                         if method.sig.ident == "new" {
-                            quote! { iridis_url_scheme::prelude::thirdparty::eyre::Result<Box<dyn UrlSchemePlugin>> }
+                            quote! { iridis_url_scheme::prelude::thirdparty::eyre::Result<Box<dyn iridis_url_scheme::prelude::UrlSchemePlugin>> }
                         } else {
                             quote! { #ty }
                         }
@@ -101,7 +101,7 @@ pub fn url_scheme_plugin(attr: TokenStream, item: TokenStream) -> TokenStream {
                     method.block = syn::parse_quote! {
                         {
                             #runtime_tokens(async move {
-                                #old_block.map(|node| Box::new(node) as Box<dyn UrlSchemePlugin>)
+                                #old_block.map(|node| Box::new(node) as Box<dyn iridis_url_scheme::prelude::UrlSchemePlugin>)
                             })
                         }
                     };
