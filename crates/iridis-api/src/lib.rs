@@ -1,4 +1,3 @@
-// TODO: REFORMAT io functions inputs outputs to be consistent
 pub(crate) mod io;
 pub(crate) mod message;
 pub(crate) mod node;
