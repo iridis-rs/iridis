@@ -29,7 +29,7 @@ categories = []
 documentation = "https://github.com/iridis-rs/iridis"
 license = "Apache-2.0"
 repository = "https://github.com/iridis-rs/iridis"
-version = "0.3.3"
+version = "0.3.4"
 
 [workspace.dependencies]
 eyre = { version = "0.6", default-features = false, features = [
@@ -65,26 +65,26 @@ tokio = { version = "1", features = [
 tracing = "0.1"
 tracing-subscriber = "0.3"
 
-iridis-layout = { version = "0.3.3", path = "crates/iridis-layout" }
+iridis-layout = { version = "0.3.4", path = "crates/iridis-layout" }
 
-iridis-message = { version = "0.3.3", path = "crates/iridis-message" }
-iridis-message-derive = { version = "0.3.3", path = "crates/derive/iridis-message-derive" }
+iridis-message = { version = "0.3.4", path = "crates/iridis-message" }
+iridis-message-derive = { version = "0.3.4", path = "crates/derive/iridis-message-derive" }
 
-iridis-api = { version = "0.3.3", path = "crates/iridis-api" }
-iridis-api-derive = { version = "0.3.3", path = "crates/derive/iridis-api-derive" }
+iridis-api = { version = "0.3.4", path = "crates/iridis-api" }
+iridis-api-derive = { version = "0.3.4", path = "crates/derive/iridis-api-derive" }
 
-iridis-builtins = { version = "0.3.3", path = "crates/iridis-builtins" }
+iridis-builtins = { version = "0.3.4", path = "crates/iridis-builtins" }
 
-iridis-flows = { version = "0.3.3", path = "crates/iridis-flows" }
+iridis-flows = { version = "0.3.4", path = "crates/iridis-flows" }
 
-iridis-runtime-core = { version = "0.3.3", path = "crates/iridis-runtime-core" }
+iridis-runtime-core = { version = "0.3.4", path = "crates/iridis-runtime-core" }
 
-iridis-file-ext = { version = "0.3.3", path = "crates/plugins/iridis-file-ext" }
-iridis-file-ext-derive = { version = "0.3.3", path = "crates/derive/iridis-file-ext-derive" }
-iridis-url-scheme = { version = "0.3.3", path = "crates/plugins/iridis-url-scheme" }
-iridis-url-scheme-derive = { version = "0.3.3", path = "crates/derive/iridis-url-scheme-derive" }
+iridis-file-ext = { version = "0.3.4", path = "crates/plugins/iridis-file-ext" }
+iridis-file-ext-derive = { version = "0.3.4", path = "crates/derive/iridis-file-ext-derive" }
+iridis-url-scheme = { version = "0.3.4", path = "crates/plugins/iridis-url-scheme" }
+iridis-url-scheme-derive = { version = "0.3.4", path = "crates/derive/iridis-url-scheme-derive" }
 
-iridis = { version = "0.3.1", path = "crates/iridis" }
+iridis = { version = "0.3.4", path = "crates/iridis" }
 
 
 [workspace.metadata.release]
