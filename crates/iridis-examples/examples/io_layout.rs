@@ -1,22 +1,22 @@
-use iridis_layout::prelude::{thirdparty::*, *};
+use iridis::prelude::{thirdparty::*, *};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let mut layout = DataflowLayout::new();
 
-    let (_source, _output) = layout
+    let (_source, output) = layout
         .node("source", async |builder: &mut NodeIOBuilder| {
             builder.output("out")
         })
         .await;
 
-    let (_operator, (_op_in, _op_out)) = layout
+    let (_operator, (op_in, op_out)) = layout
         .node("operator", async |builder: &mut NodeIOBuilder| {
             (builder.input("in"), builder.output("out"))
         })
         .await;
 
-    let (_sink, _input) = layout
+    let (_sink, input) = layout
         .node("sink", async |builder: &mut NodeIOBuilder| {
             builder.input("in")
         })
@@ -24,7 +24,13 @@ async fn main() -> Result<()> {
 
     let layout = layout.build();
 
-    println!("{:?}", layout);
+    let _flows = Flows::new(layout.clone(), async move |builder: &mut FlowsBuilder| {
+        builder.connect(op_in, output, None)?;
+        builder.connect(input, op_out, None)?;
+
+        Ok(())
+    })
+    .await?;
 
     Ok(())
 }

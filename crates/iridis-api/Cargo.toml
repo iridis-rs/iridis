@@ -31,18 +31,3 @@ iridis-message = { workspace = true }
 iridis-layout = { workspace = true }
 
 iridis-api-derive = { workspace = true }
-
-[[example]]
-name = "sink"
-path = "examples/sink.rs"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "service"
-path = "examples/service.rs"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "client"
-path = "examples/client.rs"
-crate-type = ["cdylib"]

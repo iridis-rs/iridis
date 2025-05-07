@@ -1,0 +1,45 @@
+[package]
+name = "iridis-examples"
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+readme.workspace = true
+rust-version.workspace = true
+categories.workspace = true
+documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[features]
+default = ["iridis"]
+cdylib = []
+
+[dependencies]
+iridis = { workspace = true, optional = true }
+iridis-api = { workspace = true }
+iridis-message = { workspace = true }
+
+tracing-subscriber = { workspace = true }
+
+[[example]]
+name = "sink"
+path = "examples/sink.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "source"
+path = "examples/source.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "service"
+path = "examples/service.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "client"
+path = "examples/client.rs"
+crate-type = ["cdylib"]

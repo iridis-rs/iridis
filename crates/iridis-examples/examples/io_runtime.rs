@@ -41,10 +41,19 @@ async fn main() -> Result<()> {
     )
     .await?;
 
+    let path = std::env::var("CARGO_MANIFEST_DIR")?;
+    let examples = format!("file://{}/../../target/debug/examples", path);
+
+    let prefix = std::env::consts::DLL_PREFIX;
+    let suffix = std::env::consts::DLL_SUFFIX;
+
     runtime
         .run(flows, async move |loader: &mut NodeLoader| {
+            let source_file = Url::parse(&format!("{}/{}source{}", examples, prefix, suffix))?;
+            let sink_file = Url::parse(&format!("{}/{}sink{}", examples, prefix, suffix))?;
+
             loader
-                .load::<Timer>(source, serde_yml::from_str("frequency: 1.0")?)
+                .load_url(source_file, source, serde_yml::from_str("")?)
                 .await?;
 
             loader
@@ -52,7 +61,7 @@ async fn main() -> Result<()> {
                 .await?;
 
             loader
-                .load::<Printer>(sink, serde_yml::from_str("")?)
+                .load_url(sink_file, sink, serde_yml::from_str("")?)
                 .await?;
 
             Ok(())

@@ -13,6 +13,7 @@ members = [
     "crates/plugins/iridis-file-ext",
     "crates/derive/iridis-file-ext-derive",
     "crates/derive/iridis-url-scheme-derive",
+    "crates/iridis-examples",
 ]
 resolver = "3"
 
@@ -83,7 +84,7 @@ iridis-file-ext-derive = { version = "0.3.3", path = "crates/derive/iridis-file-
 iridis-url-scheme = { version = "0.3.3", path = "crates/plugins/iridis-url-scheme" }
 iridis-url-scheme-derive = { version = "0.3.3", path = "crates/derive/iridis-url-scheme-derive" }
 
-iridis = { version = "0.3.1", path = "crates/iridis-runtime" }
+iridis = { version = "0.3.1", path = "crates/iridis" }
 
 
 [workspace.metadata.release]

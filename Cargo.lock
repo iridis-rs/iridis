@@ -553,6 +553,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "iridis-examples"
+version = "0.3.3"
+dependencies = [
+ "iridis",
+ "iridis-api",
+ "iridis-message",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "iridis-file-ext"
 version = "0.3.3"
 dependencies = [

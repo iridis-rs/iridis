@@ -4,13 +4,42 @@ fix:
 
 build:
     cargo build
-    cargo build --examples
-    cargo build --example sink --features cdylib
-    cargo build --example service --features cdylib
-    cargo build --example client --features cdylib
 
-simple_runtime: build
-    cargo run --example simple_runtime
+client: build
+    cargo build --example client --no-default-features --features cdylib
 
-service_runtime: build
+io_layout:
+    cargo run --example io_layout
+
+io_runtime: sink source
+    cargo run --example io_runtime
+
+message_complex:
+    cargo run --example message_complex
+
+message_derive:
+    cargo run --example message_derive
+
+message_enum_derive:
+    cargo run --example message_enum_derive
+
+message_enum_impl:
+    cargo run --example message_enum_impl
+
+message_impl:
+    cargo run --example message_impl
+
+service: build
+    cargo build --example service --no-default-features --features cdylib
+
+service_layout:
+    cargo run --example service_layout
+
+service_runtime: client service
     cargo run --example service_runtime
+
+sink: build
+    cargo build --example sink --no-default-features --features cdylib
+
+source: build
+    cargo build --example source --no-default-features --features cdylib
