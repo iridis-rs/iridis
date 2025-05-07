@@ -1,8 +1,12 @@
-use crate::prelude::{thirdparty::libloading::Library, *};
+use crate::prelude::{thirdparty::libloading, *};
 
 pub struct DynamicallyLinkedNode {
     pub handle: Box<dyn Node>,
-    pub _library: Library,
+
+    #[cfg(not(target_family = "unix"))]
+    pub _library: libloading::Library,
+    #[cfg(target_family = "unix")]
+    pub _library: libloading::os::unix::Library,
 }
 
 pub enum RuntimeNode {

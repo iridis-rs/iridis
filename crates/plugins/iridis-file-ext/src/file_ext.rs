@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
-use crate::prelude::{thirdparty::libloading::Library, *};
+use crate::prelude::{thirdparty::libloading, *};
 
 pub struct FileExtManager {
     pub plugins: HashMap<String, Arc<RuntimeFileExt>>,
@@ -77,8 +77,19 @@ impl FileExtManagerBuilder {
                     let path_buf = path.clone();
                     let (library, constructor) = tokio::task::spawn_blocking(move || {
                         let library = unsafe {
-                            Library::new(path_buf.clone())
-                                .wrap_err(format!("Failed to load path {:?}", path_buf))?
+                            #[cfg(target_family = "unix")]
+                            let library = libloading::os::unix::Library::open(
+                                Some(path_buf.clone()),
+                                libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+                            )
+                            .wrap_err(format!("Failed to load path {:?}", path_buf))?;
+
+
+                            #[cfg(not(target_family = "unix"))]
+                            let library = Library::new(path_buf.clone())
+                                .wrap_err(format!("Failed to load path {:?}", path_buf))?;
+
+                            library
                         };
 
                         let constructor = unsafe {
@@ -128,7 +139,12 @@ impl FileExtManagerBuilder {
 
 pub struct DynamicallyLinkedFileExtPlugin {
     pub handle: Box<dyn FileExtPlugin>,
-    pub _library: Library, // Order is important !!! TODO: change to ManuallyDrop
+
+    // Order is important !!! TODO: change to ManuallyDrop
+    #[cfg(not(target_family = "unix"))]
+    pub _library: libloading::Library,
+    #[cfg(target_family = "unix")]
+    pub _library: libloading::os::unix::Library,
 }
 
 pub enum RuntimeFileExt {
