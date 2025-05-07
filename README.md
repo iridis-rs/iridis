@@ -130,6 +130,43 @@ loader.load_url(Url::parse("file:///path/to/timer.so")?, source, serde_yml::from
 
 For a complete example of a project with multiple nodes—both statically linked and dynamically loaded—see [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark).
 
+## Examples
+
+Multiple examples can be found in [this directory](crates/iridis-examples) and can be launched with `just`:
+
+### Example of full layouts, ready to be put inside the runtime
+
+```bash
+just io_layout
+just service_layout
+```
+
+### Example of message definitions
+
+```bash
+just message_complex
+just message_derive
+just message_enum_derive
+just message_enum_impl
+just message_impl
+```
+
+### Example of nodes implementation
+
+```bash
+just sink
+just source
+just client
+just service
+```
+
+### Example of applications
+
+```bash
+just io_runtime
+just service_runtime
+```
+
 ## Python
 
 It's possible to write your nodes in python. You will need to add the `PythonFileExt` plugin into your runtime to be able to load a `.py` file. See
