@@ -38,20 +38,22 @@ async fn main() -> Result<()> {
     )
     .await?;
 
-    let path = std::env::var("CARGO_MANIFEST_DIR")?;
-    let examples = format!("file://{}/../../target/debug/examples", path);
-
     runtime
         .run(flows, async move |loader: &mut NodeLoader| {
-            let service_file = Url::parse(&format!("{}/libservice.so", examples))?;
-            let client_file = Url::parse(&format!("{}/libclient.so", examples))?;
-
             loader
-                .load_url(service_file, service, serde_yml::from_str("")?)
+                .load_url(
+                    iridis_examples::dylib("service", None)?,
+                    service,
+                    serde_yml::from_str("")?,
+                )
                 .await?;
 
             loader
-                .load_url(client_file, client, serde_yml::from_str("")?)
+                .load_url(
+                    iridis_examples::dylib("client", None)?,
+                    client,
+                    serde_yml::from_str("")?,
+                )
                 .await?;
 
             Ok(())
