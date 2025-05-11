@@ -14,7 +14,7 @@ In addition, we provide two plugin APIs:
 
 Each plugin can be loaded into the `iridis` runtime upon initialization.
 
-See [*the official wiki*](https://iridis.github.io/iridis) for more information.
+See [*the official wiki*](https://iridis-rs.github.io/iridis) for more information.
 
 ## Usage
 
