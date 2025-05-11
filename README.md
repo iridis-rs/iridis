@@ -4,7 +4,7 @@
 
 It consists of two main APIs:
 
-* `iridis-api`: the primary API used to implement each node in the dataflow graph.
+* `iridis-node`: the primary API used to implement each node in the dataflow graph.
 * `iridis`: the `runtime` API responsible for loading all nodes and launching the application.
 
 In addition, we provide two plugin APIs:
@@ -14,12 +14,14 @@ In addition, we provide two plugin APIs:
 
 Each plugin can be loaded into the `iridis` runtime upon initialization.
 
+See [*the official wiki*](https://iridis.github.io/iridis) for more information.
+
 ## Usage
 
 In a `lib` crate, you can define a `node` like this:
 
 ```rust
-use iridis_api::prelude::{thirdparty::*, *};
+use iridis_node::prelude::{thirdparty::*, *};
 
 #[derive(Node)]
 pub struct MySink {

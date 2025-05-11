@@ -10,7 +10,7 @@ pub mod prelude {
     pub use crate::timer::*;
     pub use crate::transport::*;
 
-    pub use iridis_api::{self, prelude::*};
+    pub use iridis_node::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

@@ -21,7 +21,7 @@ libloading = { workspace = true }
 url = { workspace = true }
 tracing = { workspace = true }
 
-iridis-api = { workspace = true }
+iridis-node = { workspace = true }
 iridis-runtime-core = { workspace = true }
 
 iridis-file-ext = { workspace = true }

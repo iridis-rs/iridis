@@ -1,4 +1,4 @@
-use iridis_api::prelude::{thirdparty::*, *};
+use iridis_node::prelude::{thirdparty::*, *};
 
 #[derive(Node)]
 pub struct MyClient {

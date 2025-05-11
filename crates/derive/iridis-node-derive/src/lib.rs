@@ -18,17 +18,17 @@ pub fn derive_node(input: TokenStream) -> TokenStream {
         #[cfg(feature = "cdylib")]
         #[doc(hidden)]
         #[unsafe(no_mangle)]
-        pub static IRIDIS_NODE: iridis_api::prelude::DynamicallyLinkedNodeInstance = |inputs, outputs, queries, queryables, configuration| {
+        pub static IRIDIS_NODE: iridis_node::prelude::DynamicallyLinkedNodeInstance = |inputs, outputs, queries, queryables, configuration| {
             <#name>::new(inputs, outputs, queries, queryables, configuration)
         };
 
-        static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<iridis_api::prelude::thirdparty::tokio::runtime::Runtime> =
-            std::sync::LazyLock::new(|| iridis_api::prelude::thirdparty::tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime"));
+        static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<iridis_node::prelude::thirdparty::tokio::runtime::Runtime> =
+            std::sync::LazyLock::new(|| iridis_node::prelude::thirdparty::tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime"));
 
         fn default_runtime<T: Send + 'static>(
             task: impl Future<Output = T> + Send + 'static,
-        ) -> iridis_api::prelude::thirdparty::tokio::task::JoinHandle<T> {
-            match iridis_api::prelude::thirdparty::tokio::runtime::Handle::try_current() {
+        ) -> iridis_node::prelude::thirdparty::tokio::task::JoinHandle<T> {
+            match iridis_node::prelude::thirdparty::tokio::runtime::Handle::try_current() {
                 Ok(handle) => handle.spawn(task),
                 Err(_) => DEFAULT_TOKIO_RUNTIME.spawn(task)
             }
@@ -85,7 +85,7 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
                     ReturnType::Default => quote! { () },
                     ReturnType::Type(_, ty) => {
                         if method.sig.ident == "new" {
-                            quote! { iridis_api::prelude::thirdparty::eyre::Result<Box<dyn iridis_api::prelude::Node>> }
+                            quote! { iridis_node::prelude::thirdparty::eyre::Result<Box<dyn iridis_node::prelude::Node>> }
                         } else {
                             quote! { #ty }
                         }
@@ -100,7 +100,7 @@ pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
                     method.block = syn::parse_quote! {
                         {
                             #runtime_tokens(async move {
-                                #old_block.map(|node| Box::new(node) as Box<dyn iridis_api::prelude::Node>)
+                                #old_block.map(|node| Box::new(node) as Box<dyn iridis_node::prelude::Node>)
                             })
                         }
                     };

@@ -19,7 +19,7 @@ cdylib = []
 
 [dependencies]
 iridis = { workspace = true, optional = true }
-iridis-api = { workspace = true }
+iridis-node = { workspace = true }
 iridis-message = { workspace = true }
 
 tracing-subscriber = { workspace = true }

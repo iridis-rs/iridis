@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "crates/iridis-api",
-    "crates/derive/iridis-api-derive",
+    "crates/iridis-node",
+    "crates/derive/iridis-node-derive",
     "crates/iridis-builtins",
     "crates/iridis-layout",
     "crates/iridis-message",
@@ -70,8 +70,8 @@ iridis-layout = { version = "0.3.4", path = "crates/iridis-layout" }
 iridis-message = { version = "0.3.4", path = "crates/iridis-message" }
 iridis-message-derive = { version = "0.3.4", path = "crates/derive/iridis-message-derive" }
 
-iridis-api = { version = "0.3.4", path = "crates/iridis-api" }
-iridis-api-derive = { version = "0.3.4", path = "crates/derive/iridis-api-derive" }
+iridis-node = { version = "0.3.4", path = "crates/iridis-node" }
+iridis-node-derive = { version = "0.3.4", path = "crates/derive/iridis-node-derive" }
 
 iridis-builtins = { version = "0.3.4", path = "crates/iridis-builtins" }
 

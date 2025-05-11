@@ -500,11 +500,11 @@ name = "iridis"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
  "iridis-builtins",
  "iridis-file-ext",
  "iridis-flows",
  "iridis-layout",
+ "iridis-node",
  "iridis-runtime-core",
  "iridis-url-scheme",
  "libloading",
@@ -517,37 +517,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "iridis-api"
-version = "0.3.4"
-dependencies = [
- "arrow-array",
- "arrow-data",
- "eyre",
- "iridis-api-derive",
- "iridis-layout",
- "iridis-message",
- "serde_yml",
- "tokio",
- "tracing",
- "uhlc",
- "uuid",
-]
-
-[[package]]
-name = "iridis-api-derive"
-version = "0.3.4"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "iridis-builtins"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
+ "iridis-node",
  "serde_yml",
  "tokio",
 ]
@@ -557,8 +531,8 @@ name = "iridis-examples"
 version = "0.3.4"
 dependencies = [
  "iridis",
- "iridis-api",
  "iridis-message",
+ "iridis-node",
  "tracing-subscriber",
 ]
 
@@ -567,8 +541,8 @@ name = "iridis-file-ext"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
  "iridis-file-ext-derive",
+ "iridis-node",
  "iridis-runtime-core",
  "libloading",
  "serde_yml",
@@ -590,8 +564,8 @@ name = "iridis-flows"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
  "iridis-layout",
+ "iridis-node",
  "tokio",
  "tracing",
  "uhlc",
@@ -630,11 +604,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "iridis-node"
+version = "0.3.4"
+dependencies = [
+ "arrow-array",
+ "arrow-data",
+ "eyre",
+ "iridis-layout",
+ "iridis-message",
+ "iridis-node-derive",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "uhlc",
+ "uuid",
+]
+
+[[package]]
+name = "iridis-node-derive"
+version = "0.3.4"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "iridis-runtime-core"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
+ "iridis-node",
  "libloading",
 ]
 
@@ -643,8 +643,8 @@ name = "iridis-url-scheme"
 version = "0.3.4"
 dependencies = [
  "eyre",
- "iridis-api",
  "iridis-file-ext",
+ "iridis-node",
  "iridis-runtime-core",
  "iridis-url-scheme-derive",
  "libloading",

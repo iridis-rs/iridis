@@ -3,7 +3,7 @@ pub(crate) mod node;
 pub mod prelude {
     pub use crate::node::*;
 
-    pub use iridis_api::{self, prelude::*};
+    pub use iridis_node::{self, prelude::*};
 
     pub(crate) use thirdparty::*;
 

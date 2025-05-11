@@ -17,4 +17,4 @@ version.workspace = true
 eyre = { workspace = true }
 libloading = { workspace = true }
 
-iridis-api = { workspace = true }
+iridis-node = { workspace = true }

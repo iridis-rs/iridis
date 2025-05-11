@@ -1,5 +1,5 @@
 [package]
-name = "iridis-api-derive"
+name = "iridis-node-derive"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true

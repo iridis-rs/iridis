@@ -7,7 +7,7 @@ pub mod prelude {
 
     pub use iridis_file_ext_derive::*;
 
-    pub use iridis_api::{self, prelude::*};
+    pub use iridis_node::{self, prelude::*};
     pub use iridis_runtime_core::{self, prelude::*};
 
     pub(crate) use thirdparty::*;

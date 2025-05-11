@@ -1,5 +1,5 @@
 [package]
-name = "iridis-api"
+name = "iridis-node"
 authors.workspace = true
 description.workspace = true
 edition.workspace = true
@@ -30,4 +30,4 @@ arrow-array = { workspace = true }
 iridis-message = { workspace = true }
 iridis-layout = { workspace = true }
 
-iridis-api-derive = { workspace = true }
+iridis-node-derive = { workspace = true }

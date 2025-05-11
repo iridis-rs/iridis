@@ -20,5 +20,5 @@ tracing = { workspace = true }
 uuid = { workspace = true }
 uhlc = { workspace = true }
 
-iridis-api = { workspace = true }
+iridis-node = { workspace = true }
 iridis-layout = { workspace = true }

@@ -8,7 +8,7 @@ pub mod prelude {
     pub use crate::message::*;
     pub use crate::node::*;
 
-    pub use iridis_api_derive::*;
+    pub use iridis_node_derive::*;
 
     pub(crate) use crate::report::*;
 

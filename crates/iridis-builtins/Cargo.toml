@@ -21,4 +21,4 @@ eyre = { workspace = true }
 tokio = { workspace = true }
 serde_yml = { workspace = true }
 
-iridis-api = { workspace = true }
+iridis-node = { workspace = true }
