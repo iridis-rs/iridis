@@ -48,11 +48,11 @@ impl DataflowLayout {
     pub async fn node<T>(
         &mut self,
         label: impl Into<String>,
-        builder_function: impl AsyncFnOnce(&mut NodeIOBuilder) -> T,
+        builder_function: impl AsyncFnOnce(&mut Builder) -> T,
     ) -> (NodeLayout, T) {
         let label = label.into();
         let layout = NodeLayout::new(&label);
-        let mut io = NodeIOBuilder::new(&layout);
+        let mut io = Builder::new(&layout);
 
         let result = builder_function(&mut io).await;
 

@@ -6,7 +6,7 @@ pub struct UrlSchemeManager {
     pub plugins: HashMap<String, Arc<RuntimeUrlScheme>>,
 }
 
-pub struct UrlSchemeManagerBuilder {
+pub struct UrlSchemeLoader {
     pub plugins: HashMap<String, Arc<RuntimeUrlScheme>>,
 }
 
@@ -47,7 +47,7 @@ impl UrlSchemeManager {
     }
 }
 
-impl UrlSchemeManagerBuilder {
+impl UrlSchemeLoader {
     pub async fn new() -> Result<Self> {
         Ok(Self {
             plugins: HashMap::new(),

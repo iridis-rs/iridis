@@ -56,7 +56,7 @@ impl NodeLayout {
 }
 
 /// This is the object passed to the user's lambda function to build the node's IO layout
-pub struct NodeIOBuilder {
+pub struct Builder {
     /// The node layout this io builder is applied to
     pub layout: NodeLayout,
 
@@ -73,7 +73,7 @@ pub struct NodeIOBuilder {
     pub labels: HashMap<Uuid, String>,
 }
 
-impl NodeIOBuilder {
+impl Builder {
     pub fn new(layout: &NodeLayout) -> Self {
         Self {
             layout: layout.clone(),

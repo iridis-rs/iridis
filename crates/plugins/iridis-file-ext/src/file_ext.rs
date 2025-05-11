@@ -6,7 +6,7 @@ pub struct FileExtManager {
     pub plugins: HashMap<String, Arc<RuntimeFileExt>>,
 }
 
-pub struct FileExtManagerBuilder {
+pub struct FileExtLoader {
     pub plugins: HashMap<String, Arc<RuntimeFileExt>>,
 }
 
@@ -41,9 +41,9 @@ impl FileExtManager {
     }
 }
 
-impl FileExtManagerBuilder {
+impl FileExtLoader {
     pub async fn new() -> Result<Self> {
-        Ok(FileExtManagerBuilder {
+        Ok(FileExtLoader {
             plugins: HashMap::new(),
         })
     }

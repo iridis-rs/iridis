@@ -22,7 +22,7 @@ pub struct Flows {
 }
 
 /// This is the builder struct available for the user closure when creating flows.
-pub struct FlowsBuilder {
+pub struct Connector {
     pub layout: Arc<DataflowLayout>,
 
     pub inputs_receivers: HashMap<Uuid, MessageReceiver>,
@@ -39,9 +39,9 @@ impl Flows {
     /// Creates a new Flows instance with a Building async closure
     pub async fn new(
         layout: Arc<DataflowLayout>,
-        flows: impl AsyncFnOnce(&mut FlowsBuilder) -> Result<()>,
+        flows: impl AsyncFnOnce(&mut Connector) -> Result<()>,
     ) -> Result<Self> {
-        let mut builder = FlowsBuilder::new(layout);
+        let mut builder = Connector::new(layout);
 
         flows(&mut builder).await?;
 
@@ -80,7 +80,7 @@ impl Flows {
     }
 }
 
-impl FlowsBuilder {
+impl Connector {
     pub fn new(layout: Arc<DataflowLayout>) -> Self {
         Self {
             layout,

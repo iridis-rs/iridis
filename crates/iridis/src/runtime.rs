@@ -15,13 +15,10 @@ pub struct Runtime {
 impl Runtime {
     /// Create a new runtime instance with plugins.
     pub async fn new(
-        plugins: impl AsyncFnOnce(
-            &mut FileExtManagerBuilder,
-            &mut UrlSchemeManagerBuilder,
-        ) -> Result<()>,
+        plugins: impl AsyncFnOnce(&mut FileExtLoader, &mut UrlSchemeLoader) -> Result<()>,
     ) -> Result<Self> {
-        let mut file_ext = FileExtManagerBuilder::new().await?;
-        let mut url_scheme = UrlSchemeManagerBuilder::new().await?;
+        let mut file_ext = FileExtLoader::new().await?;
+        let mut url_scheme = UrlSchemeLoader::new().await?;
 
         file_ext
             .load_statically_linked_plugin::<DefaultFileExtPlugin>()
@@ -45,10 +42,10 @@ impl Runtime {
     pub async fn run(
         mut self,
         flows: Flows,
-        nodes: impl AsyncFnOnce(&mut NodeLoader) -> Result<()>,
+        nodes: impl AsyncFnOnce(&mut Loader) -> Result<()>,
     ) -> Result<()> {
         let mut node_loader =
-            NodeLoader::new(self.file_ext, self.url_scheme, self.clock.clone(), flows);
+            Loader::new(self.file_ext, self.url_scheme, self.clock.clone(), flows);
 
         nodes(&mut node_loader).await?;
 

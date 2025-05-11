@@ -7,7 +7,7 @@ async fn main() -> Result<()> {
     let mut layout = DataflowLayout::new();
 
     let (service, (compare_to_128, compare_to_64)) = layout
-        .node("service", async |builder: &mut NodeIOBuilder| {
+        .node("service", async |builder: &mut Builder| {
             (
                 builder.queryable("compare_to_128"),
                 builder.queryable("compare_to_64"),
@@ -16,30 +16,28 @@ async fn main() -> Result<()> {
         .await;
 
     let (client, (ask_128, ask_64)) = layout
-        .node("client", async |builder: &mut NodeIOBuilder| {
+        .node("client", async |builder: &mut Builder| {
             (builder.query("ask_128"), builder.query("ask_64"))
         })
         .await;
 
     let layout = layout.build();
 
-    let flows = Flows::new(layout.clone(), async move |builder: &mut FlowsBuilder| {
-        builder.connect(ask_128, compare_to_128, None)?;
-        builder.connect(ask_64, compare_to_64, None)?;
+    let flows = Flows::new(layout.clone(), async move |flows: &mut Connector| {
+        flows.connect(ask_128, compare_to_128, None)?;
+        flows.connect(ask_64, compare_to_64, None)?;
 
         Ok(())
     })
     .await?;
 
     let runtime = Runtime::new(
-        async |_file_ext: &mut FileExtManagerBuilder, _url_scheme: &mut UrlSchemeManagerBuilder| {
-            Ok(())
-        },
+        async |_file_ext: &mut FileExtLoader, _url_scheme: &mut UrlSchemeLoader| Ok(()),
     )
     .await?;
 
     runtime
-        .run(flows, async move |loader: &mut NodeLoader| {
+        .run(flows, async move |loader: &mut Loader| {
             loader
                 .load_url(
                     iridis_examples::dylib("service", None)?,

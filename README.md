@@ -60,28 +60,28 @@ async fn main() -> Result<()> {
     let mut layout = DataflowLayout::new();
 
     let (source, output) = layout
-        .node("source", async |builder: &mut NodeIOBuilder| {
+        .node("source", async |builder: &mut Builder| {
             builder.output("out")
         })
         .await;
 
     let (operator, (op_in, op_out)) = layout
-        .node("operator", async |builder: &mut NodeIOBuilder| {
+        .node("operator", async |builder: &mut Builder| {
             (builder.input("in"), builder.output("out"))
         })
         .await;
 
     let (sink, input) = layout
-        .node("sink", async |builder: &mut NodeIOBuilder| {
+        .node("sink", async |builder: &mut Builder| {
             builder.input("in")
         })
         .await;
 
     let layout = layout.build();
 
-    let flows = Flows::new(layout.clone(), async move |builder: &mut FlowsBuilder| {
-        builder.connect(op_in, output, None)?;
-        builder.connect(input, op_out, None)?;
+    let flows = Flows::new(layout.clone(), async move |flows: &mut Connector| {
+        flows.connect(op_in, output, None)?;
+        flows.connect(input, op_out, None)?;
 
         Ok(())
     })
@@ -95,14 +95,14 @@ Finally, create a runtime, load your plugins, and load a `node implementation` f
 
 ```rust
 let runtime = Runtime::new(
-    async |_file_ext: &mut FileExtManagerBuilder, _url_scheme: &mut UrlSchemeManagerBuilder| {
+    async |_file_ext: &mut FileExtLoader, _url_scheme: &mut UrlSchemeLoader| {
         Ok(())
     },
 )
 .await?;
 
 runtime
-    .run(flows, async move |loader: &mut NodeLoader| {
+    .run(flows, async move |loader: &mut Loader| {
         loader
             .load::<Timer>(source, serde_yml::from_str("frequency: 1.0")?)
             .await?;

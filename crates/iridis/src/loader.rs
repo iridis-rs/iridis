@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use crate::prelude::*;
 
 /// Loader struct passed to the user closure to load nodes
-pub struct NodeLoader {
+pub struct Loader {
     pub file_ext: Arc<FileExtManager>,
     pub url_scheme: Arc<UrlSchemeManager>,
 
@@ -13,7 +13,7 @@ pub struct NodeLoader {
     pub nodes: HashMap<NodeLayout, RuntimeNode>,
 }
 
-impl NodeLoader {
+impl Loader {
     pub fn new(
         file_ext: Arc<FileExtManager>,
         url_scheme: Arc<UrlSchemeManager>,
