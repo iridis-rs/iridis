@@ -42,9 +42,9 @@ impl RuntimeFlows {
 
                 let (sender, receiver) = tokio::sync::mpsc::channel(128);
 
-                inputs_receivers.insert(input.clone(), receiver);
+                inputs_receivers.insert(*input, receiver);
                 outputs_senders
-                    .entry(output.clone())
+                    .entry(*output)
                     .or_insert_with(Vec::new)
                     .push(sender);
             }
@@ -54,14 +54,14 @@ impl RuntimeFlows {
 
                 let (sender, receiver) = tokio::sync::mpsc::channel(128);
 
-                queries_receivers.insert(query.clone(), receiver);
+                queries_receivers.insert(*query, receiver);
 
                 let queryables_senders = queryables_senders
-                    .entry(queryable.clone())
+                    .entry(*queryable)
                     .or_insert_with(HashMap::new);
 
                 if !queryables_senders.contains_key(query) {
-                    queryables_senders.insert(query.clone(), sender);
+                    queryables_senders.insert(*query, sender);
                 }
             }
 
@@ -71,27 +71,27 @@ impl RuntimeFlows {
                 if !queryables_receivers.contains_key(queryable) {
                     let (sender, receiver) = tokio::sync::mpsc::channel(128);
 
-                    queries_senders.insert(query.clone(), sender);
-                    queryables_receivers.insert(queryable.clone(), receiver);
+                    queries_senders.insert(*query, sender);
+                    queryables_receivers.insert(*queryable, receiver);
                 } else {
                     let other_query = match queryable_queries.get(queryable) {
                         Some(queries) => queries.iter().next(),
                         None => None,
                     }
-                    .ok_or_eyre(report_primitive_not_found(queryable.clone()))?;
+                    .ok_or_eyre(report_primitive_not_found(*queryable))?;
 
                     let sender = queries_senders
                         .get(other_query)
-                        .ok_or_eyre(report_primitive_not_found(other_query.clone()))?
+                        .ok_or_eyre(report_primitive_not_found(*other_query))?
                         .clone();
 
-                    queries_senders.insert(query.clone(), sender);
+                    queries_senders.insert(*query, sender);
                 }
 
                 queryable_queries
-                    .entry(queryable.clone())
-                    .or_insert_with(HashSet::new)
-                    .insert(query.clone());
+                    .entry(*queryable)
+                    .or_default()
+                    .insert(*query);
             }
         }
 

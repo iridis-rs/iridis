@@ -1,7 +1,6 @@
 set quiet
 
 fix:
-    cargo fix --workspace --allow-dirty
     cargo clippy --fix --allow-dirty
 
 build:
@@ -12,6 +11,9 @@ client: build
 
 io_layout:
     cargo run --example io_layout
+
+io_layout_thr:
+    cargo run --example io_layout_thr
 
 io_runtime: sink source
     cargo run --example io_runtime
