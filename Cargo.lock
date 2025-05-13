@@ -502,7 +502,6 @@ dependencies = [
  "eyre",
  "iridis-builtins",
  "iridis-file-ext",
- "iridis-flows",
  "iridis-layout",
  "iridis-node",
  "iridis-runtime-core",
@@ -557,19 +556,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "iridis-flows"
-version = "0.3.4"
-dependencies = [
- "eyre",
- "iridis-layout",
- "iridis-node",
- "tokio",
- "tracing",
- "uhlc",
- "uuid",
 ]
 
 [[package]]

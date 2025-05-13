@@ -9,8 +9,8 @@ pub struct Loader {
 
     pub clock: Arc<HLC>,
 
-    pub flows: Flows,
-    pub nodes: HashMap<NodeLayout, RuntimeNode>,
+    pub flows: RuntimeFlows,
+    pub nodes: HashMap<NodeID, RuntimeNode>,
 }
 
 impl Loader {
@@ -18,7 +18,7 @@ impl Loader {
         file_ext: Arc<FileExtManager>,
         url_scheme: Arc<UrlSchemeManager>,
         clock: Arc<HLC>,
-        flows: Flows,
+        flows: RuntimeFlows,
     ) -> Self {
         Self {
             file_ext,
@@ -32,11 +32,12 @@ impl Loader {
     /// Load a node from a Rust struct directly (statically linked)
     pub async fn load<T: Node + 'static>(
         &mut self,
-        source: NodeLayout,
+        source: NodeID,
         configuration: serde_yml::Value,
     ) -> Result<()> {
-        let (inputs, outputs, queries, queryables) =
-            self.flows.node_io(self.clock.clone(), source.clone());
+        let (inputs, outputs, queries, queryables) = self
+            .flows
+            .node_primitives(self.clock.clone(), source.clone());
 
         let node = RuntimeNode::StaticallyLinked(
             T::new(inputs, outputs, queries, queryables, configuration)
@@ -63,11 +64,12 @@ impl Loader {
     pub async fn load_url(
         &mut self,
         url: Url,
-        source: NodeLayout,
+        source: NodeID,
         configuration: serde_yml::Value,
     ) -> Result<()> {
-        let (inputs, outputs, queries, queryables) =
-            self.flows.node_io(self.clock.clone(), source.clone());
+        let (inputs, outputs, queries, queryables) = self
+            .flows
+            .node_primitives(self.clock.clone(), source.clone());
 
         let node = self
             .url_scheme

@@ -1,12 +1,12 @@
-pub(crate) mod io;
 pub(crate) mod message;
 pub(crate) mod node;
+pub(crate) mod primitives;
 pub(crate) mod report;
 
 pub mod prelude {
-    pub use crate::io::*;
     pub use crate::message::*;
     pub use crate::node::*;
+    pub use crate::primitives::*;
 
     pub use iridis_node_derive::*;
 

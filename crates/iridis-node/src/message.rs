@@ -28,3 +28,26 @@ pub type MessageSender = Sender<DataflowMessage>;
 
 /// MPSC Message receiver. Cannot be cloned
 pub type MessageReceiver = Receiver<DataflowMessage>;
+
+/// Typed dataflow message
+#[derive(Debug, PartialEq, Clone)]
+pub struct TypedDataflowMessage<T: ArrowMessage> {
+    pub header: Header,
+    pub data: T,
+}
+
+impl<T> TryFrom<DataflowMessage> for TypedDataflowMessage<T>
+where
+    T: ArrowMessage,
+{
+    type Error = eyre::Report;
+
+    fn try_from(value: DataflowMessage) -> Result<Self> {
+        let data = T::try_from_arrow(value.data)?;
+
+        Ok(Self {
+            header: value.header,
+            data,
+        })
+    }
+}

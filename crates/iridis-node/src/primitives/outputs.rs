@@ -12,12 +12,12 @@ pub struct Outputs {
     senders: Senders,
     clock: Arc<uhlc::HLC>,
 
-    source: NodeLayout,
+    source: NodeID,
 }
 
 impl Outputs {
     /// Creates a new instance of `Outputs`
-    pub fn new(senders: Senders, clock: Arc<uhlc::HLC>, source: NodeLayout) -> Self {
+    pub fn new(senders: Senders, clock: Arc<uhlc::HLC>, source: NodeID) -> Self {
         Self {
             senders,
             clock,
@@ -28,7 +28,7 @@ impl Outputs {
     async fn compute(
         &mut self,
         output: impl Into<String>,
-    ) -> Result<(Vec<MessageSender>, OutputLayout)> {
+    ) -> Result<(Vec<MessageSender>, OutputID)> {
         let label: String = output.into();
         let layout = self.source.output(&label);
 

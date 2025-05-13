@@ -9,7 +9,7 @@ pub struct Runtime {
     pub file_ext: Arc<FileExtManager>,
     pub url_scheme: Arc<UrlSchemeManager>,
 
-    pub nodes: HashMap<NodeLayout, RuntimeNode>,
+    pub nodes: HashMap<NodeID, RuntimeNode>,
 }
 
 impl Runtime {
@@ -41,17 +41,17 @@ impl Runtime {
     /// Load all nodes with the flows provided and run them all.
     pub async fn run(
         mut self,
-        flows: Flows,
+        layout: Arc<DataflowLayout>,
         nodes: impl AsyncFnOnce(&mut Loader) -> Result<()>,
     ) -> Result<()> {
+        let flows = RuntimeFlows::new(layout)?;
+
         let mut node_loader =
             Loader::new(self.file_ext, self.url_scheme, self.clock.clone(), flows);
 
         nodes(&mut node_loader).await?;
 
         self.nodes.extend(node_loader.nodes);
-
-        println!("Starting runtime... (press Ctrl+C to stop)");
 
         let mut tasks = Vec::new();
         for (layout, node) in self.nodes {

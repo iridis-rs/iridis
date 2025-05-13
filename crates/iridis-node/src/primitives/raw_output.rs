@@ -11,19 +11,14 @@ pub struct RawOutput {
     pub clock: Arc<HLC>,
 
     /// The source node layout, useful for debugging
-    pub source: NodeLayout,
+    pub source: NodeID,
     /// The layout of the output, useful for debugging
-    pub layout: OutputLayout,
+    pub layout: OutputID,
 }
 
 impl RawOutput {
     /// Create a new RawOutput instance
-    pub fn new(
-        tx: Vec<MessageSender>,
-        clock: Arc<HLC>,
-        source: NodeLayout,
-        layout: OutputLayout,
-    ) -> Self {
+    pub fn new(tx: Vec<MessageSender>, clock: Arc<HLC>, source: NodeID, layout: OutputID) -> Self {
         Self {
             tx,
             clock,

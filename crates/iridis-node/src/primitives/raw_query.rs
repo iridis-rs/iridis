@@ -13,9 +13,9 @@ pub struct RawQuery {
     pub clock: Arc<HLC>,
 
     /// The source node layout, useful for debugging
-    pub source: NodeLayout,
+    pub source: NodeID,
     /// The layout of the query, useful for debugging
-    pub layout: QueryLayout,
+    pub layout: QueryID,
 }
 
 impl RawQuery {
@@ -24,8 +24,8 @@ impl RawQuery {
         tx: MessageSender,
         rx: MessageReceiver,
         clock: Arc<HLC>,
-        source: NodeLayout,
-        layout: QueryLayout,
+        source: NodeID,
+        layout: QueryID,
     ) -> Self {
         Self {
             tx,

@@ -31,9 +31,9 @@ impl Node for MyService {
         let mut compare_to_128 = self.compare_to_128;
         let task_128: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
             while let Ok(()) = compare_to_128
-                .on_query(async |query| match query > 128 {
-                    true => Ok(format!("{} is greater than 128", query).to_string()),
-                    false => Ok(format!("{} is less than or equal to 128", query).to_string()),
+                .on_query(async |query| match query.data > 128 {
+                    true => Ok(format!("{} is greater than 128", query.data).to_string()),
+                    false => Ok(format!("{} is less than or equal to 128", query.data).to_string()),
                 })
                 .await
             {}
@@ -44,9 +44,9 @@ impl Node for MyService {
         let mut compare_to_64 = self.compare_to_64;
         let task_64: tokio::task::JoinHandle<Result<()>> = tokio::spawn(async move {
             while let Ok(()) = compare_to_64
-                .on_query(async |query| match query > 64 {
-                    true => Ok(format!("{} is greater than 64", query).to_string()),
-                    false => Ok(format!("{} is less than or equal to 64", query).to_string()),
+                .on_query(async |query| match query.data > 64 {
+                    true => Ok(format!("{} is greater than 64", query.data).to_string()),
+                    false => Ok(format!("{} is less than or equal to 64", query.data).to_string()),
                 })
                 .await
             {}

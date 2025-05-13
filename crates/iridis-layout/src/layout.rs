@@ -4,90 +4,154 @@ use std::{
     sync::Arc,
 };
 
-use crate::prelude::*;
+use crate::prelude::{thirdparty::tokio::sync::Mutex, *};
 
-/// Represents a flattened dataflow layout
-pub struct DataflowLayout {
-    /// Inputs present in the dataflow
+#[derive(Debug, Clone)]
+pub struct DataLayout {
     pub inputs: HashSet<Uuid>,
-    /// Outputs present in the dataflow
     pub outputs: HashSet<Uuid>,
-    /// Queries present in the dataflow
     pub queries: HashSet<Uuid>,
-    /// Queryables present in the dataflow
     pub queryables: HashSet<Uuid>,
+}
 
-    /// Labels for nodes and IO, useful for debugging and visualization
+#[derive(Debug, Clone)]
+pub struct DebugLayout {
     pub labels: HashMap<Uuid, String>,
-    /// Nodes representation with their IO, useful for debugging and visualization
     pub nodes: HashMap<Uuid, HashSet<Uuid>>,
 }
 
-impl Default for DataflowLayout {
-    fn default() -> Self {
-        Self::new()
+impl DebugLayout {
+    pub fn label(&self, uuid: impl AsRef<Uuid>) -> String {
+        self.labels.get(uuid.as_ref()).cloned().unwrap_or_default()
     }
 }
 
-impl DataflowLayout {
-    /// Creates a new empty dataflow layout
-    pub fn new() -> Self {
-        Self {
-            inputs: HashSet::new(),
-            outputs: HashSet::new(),
-            queryables: HashSet::new(),
-            queries: HashSet::new(),
+#[derive(Clone)]
+pub struct DataflowLayout {
+    pub data: DataLayout,
+    pub debug: DebugLayout,
+    pub flows: FlowLayout,
+}
 
-            labels: HashMap::new(),
-            nodes: HashMap::new(),
+#[derive(Debug, Clone)]
+pub struct SharedDataLayout {
+    pub data: Arc<Mutex<DataLayout>>,
+    pub debug: Arc<Mutex<DebugLayout>>,
+}
+
+impl DataflowLayout {
+    pub fn empty() -> SharedDataLayout {
+        SharedDataLayout {
+            data: Arc::new(Mutex::new(DataLayout {
+                inputs: HashSet::new(),
+                outputs: HashSet::new(),
+                queryables: HashSet::new(),
+                queries: HashSet::new(),
+            })),
+            debug: Arc::new(Mutex::new(DebugLayout {
+                labels: HashMap::new(),
+                nodes: HashMap::new(),
+            })),
         }
     }
 
-    /// Adds a new node to the dataflow layout, providing its label and a builder function for its IO.
-    /// For convenience, the node layout is returned, together with the result of the builder function.
+    pub fn label(&self, uuid: impl AsRef<Uuid>) -> String {
+        self.debug.label(uuid)
+    }
+}
+
+impl SharedDataLayout {
     pub async fn node<T>(
-        &mut self,
+        &self,
         label: impl Into<String>,
-        builder_function: impl AsyncFnOnce(&mut Builder) -> T,
-    ) -> (NodeLayout, T) {
+        layout_builder: impl AsyncFnOnce(&mut NodeLayout) -> T,
+    ) -> (NodeID, T) {
         let label = label.into();
-        let layout = NodeLayout::new(&label);
-        let mut io = Builder::new(&layout);
+        let id = NodeID::new(&label);
+        let mut layout = NodeLayout::new(&id);
 
-        let result = builder_function(&mut io).await;
+        let result = layout_builder(&mut layout).await;
 
-        self.nodes.insert(
-            layout.uuid,
-            io.inputs
-                .union(&io.outputs)
-                .chain(io.queries.union(&io.queryables))
+        let mut debug = self.debug.lock().await;
+
+        debug.nodes.insert(
+            id.uuid,
+            layout
+                .data
+                .inputs
+                .union(&layout.data.outputs)
+                .chain(layout.data.queries.union(&layout.data.queryables))
                 .cloned()
                 .collect(),
         );
 
-        self.inputs.extend(io.inputs);
-        self.outputs.extend(io.outputs);
-        self.queries.extend(io.queries);
-        self.queryables.extend(io.queryables);
-        self.labels.extend(io.labels);
+        let mut data = self.data.lock().await;
 
-        self.labels.insert(layout.uuid, label.clone());
+        data.inputs.extend(layout.data.inputs);
+        data.outputs.extend(layout.data.outputs);
+        data.queries.extend(layout.data.queries);
+        data.queryables.extend(layout.data.queryables);
 
-        tracing::debug!("Node '{}' (uuid: {}) created", label, layout.uuid);
+        debug.labels.extend(layout.debug.labels);
+        debug.labels.insert(id.uuid, label.clone());
 
-        (layout, result)
+        tracing::debug!("Node '{}' (uuid: {}) created", label, id.uuid);
+
+        (id, result)
     }
 
-    /// Access the label of an entity in the dataflow layout (node, input, output, query, queryable)
-    pub fn label(&self, uuid: impl Into<Uuid>) -> String {
-        let uuid = uuid.into();
+    pub async fn finish(
+        self,
+        flows: impl AsyncFnOnce(&mut FlowLayout) -> Result<()>,
+    ) -> Result<Arc<DataflowLayout>> {
+        let mut layout = FlowLayout {
+            connections: HashSet::new(),
+        };
 
-        self.labels.get(&uuid).cloned().unwrap_or_default()
-    }
+        flows(&mut layout).await.wrap_err("Failed to build flows")?;
 
-    /// Build the dataflow layout by making it immutable and returning an Arc
-    pub fn build(self) -> Arc<Self> {
-        Arc::new(self)
+        let data = self.data.lock().await.clone();
+        let debug = self.debug.lock().await.clone();
+
+        for (a, b) in &layout.connections {
+            match (data.outputs.contains(a), data.inputs.contains(b)) {
+                (true, true) => {}
+                (false, false) => match (data.queries.contains(a), data.queryables.contains(b)) {
+                    (true, true) => {}
+                    (false, false) => match (data.queryables.contains(a), data.queries.contains(b))
+                    {
+                        (true, true) => {}
+                        _ => {
+                            eyre::bail!(
+                                "Invalid connection between '{}' and '{}'",
+                                debug.label(a),
+                                debug.label(b)
+                            );
+                        }
+                    },
+                    _ => {
+                        eyre::bail!(
+                            "Invalid connection between '{}' and '{}'",
+                            debug.label(a),
+                            debug.label(b)
+                        );
+                    }
+                },
+                _ => {
+                    eyre::bail!(
+                        "Invalid connection between '{}' and '{}'",
+                        debug.label(a),
+                        debug.label(b)
+                    );
+                }
+            }
+        }
+
+        Ok(Arc::new(DataflowLayout {
+            data,
+            debug,
+            flows: layout,
+        }))
     }
 }
 
@@ -106,7 +170,7 @@ impl fmt::Debug for DataflowLayout {
 
         let mut nodes = Vec::new();
 
-        for (&node, io) in &self.nodes {
+        for (&node, io) in &self.debug.nodes {
             let mut layout = Layout {
                 id: (self.label(node), node),
 
@@ -117,16 +181,16 @@ impl fmt::Debug for DataflowLayout {
             };
 
             for &io in io {
-                if self.inputs.contains(&io) {
+                if self.data.inputs.contains(&io) {
                     layout.inputs.insert((self.label(io), io));
                 }
-                if self.outputs.contains(&io) {
+                if self.data.outputs.contains(&io) {
                     layout.outputs.insert((self.label(io), io));
                 }
-                if self.queryables.contains(&io) {
+                if self.data.queryables.contains(&io) {
                     layout.queryables.insert((self.label(io), io));
                 }
-                if self.queries.contains(&io) {
+                if self.data.queries.contains(&io) {
                     layout.queries.insert((self.label(io), io));
                 }
             }

@@ -2,28 +2,29 @@ use iridis::prelude::{thirdparty::*, *};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut layout = DataflowLayout::new();
+    let layout = DataflowLayout::empty();
 
     let (_service, queryable) = layout
-        .node("service", async |builder: &mut Builder| {
+        .node("service", async |builder: &mut NodeLayout| {
             builder.queryable("queryable")
         })
         .await;
 
     let (_client, query) = layout
-        .node("client", async |builder: &mut Builder| {
+        .node("client", async |builder: &mut NodeLayout| {
             builder.query("query")
         })
         .await;
 
-    let layout = layout.build();
+    let layout = layout
+        .finish(async move |flows| {
+            flows.connect(query, queryable)?;
 
-    let _flows = Flows::new(layout.clone(), async move |flows: &mut Connector| {
-        flows.connect(query, queryable, None)?;
+            Ok(())
+        })
+        .await?;
 
-        Ok(())
-    })
-    .await?;
+    println!("{:#?}", layout);
 
     Ok(())
 }

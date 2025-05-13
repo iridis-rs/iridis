@@ -20,7 +20,11 @@ impl Node for MySink {
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
-        while let Ok((_, message)) = self.input.recv().await {
+        while let Ok(TypedDataflowMessage {
+            header: _,
+            data: message,
+        }) = self.input.recv().await
+        {
             println!("Received message: {}", message);
         }
 

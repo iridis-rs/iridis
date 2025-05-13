@@ -7,14 +7,14 @@ pub struct RawInput {
     pub rx: MessageReceiver,
 
     /// The source node layout, useful for debugging
-    pub source: NodeLayout,
+    pub source: NodeID,
     /// The layout of the input, useful for debugging
-    pub layout: InputLayout,
+    pub layout: InputID,
 }
 
 impl RawInput {
     /// Create a new RawInput instance
-    pub fn new(rx: MessageReceiver, source: NodeLayout, layout: InputLayout) -> Self {
+    pub fn new(rx: MessageReceiver, source: NodeID, layout: InputID) -> Self {
         Self { rx, source, layout }
     }
 

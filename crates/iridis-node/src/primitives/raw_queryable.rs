@@ -13,9 +13,9 @@ pub struct RawQueryable {
     pub clock: Arc<HLC>,
 
     /// The source node layout, useful for debugging
-    pub source: NodeLayout,
+    pub source: NodeID,
     /// The layout of the queryable, useful for debugging
-    pub layout: QueryableLayout,
+    pub layout: QueryableID,
 }
 
 impl RawQueryable {
@@ -24,8 +24,8 @@ impl RawQueryable {
         tx: HashMap<Uuid, MessageSender>,
         rx: MessageReceiver,
         clock: Arc<HLC>,
-        source: NodeLayout,
-        layout: QueryableLayout,
+        source: NodeID,
+        layout: QueryableID,
     ) -> Self {
         Self {
             tx,

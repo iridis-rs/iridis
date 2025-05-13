@@ -3,8 +3,8 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse_macro_input, punctuated::Punctuated, token::Comma, DeriveInput, Field, Fields, Ident,
-    Token, Variant,
+    DeriveInput, Field, Fields, Ident, Token, Variant, parse_macro_input, punctuated::Punctuated,
+    token::Comma,
 };
 
 #[proc_macro_derive(ArrowMessage)]

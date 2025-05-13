@@ -16,8 +16,8 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
         tx: MessageSender,
         rx: MessageReceiver,
         clock: Arc<HLC>,
-        source: NodeLayout,
-        layout: QueryLayout,
+        source: NodeID,
+        layout: QueryID,
     ) -> Self {
         Self {
             raw: RawQuery::new(tx, rx, clock, source, layout),
@@ -26,9 +26,8 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
     }
 
     /// Query a message from the channel and converting it from Arrow format, asynchronously
-    pub async fn query(&mut self, data: T) -> Result<(Header, F)> {
-        let DataflowMessage { header, data } = self
-            .raw
+    pub async fn query(&mut self, data: T) -> Result<TypedDataflowMessage<F>> {
+        self.raw
             .query(
                 data.try_into_arrow()
                     .wrap_err(report_failed_conversion_to_arrow::<T>(
@@ -37,14 +36,11 @@ impl<T: ArrowMessage, F: ArrowMessage> Query<T, F> {
                     ))?
                     .into_data(),
             )
-            .await?;
-
-        Ok((
-            header,
-            F::try_from_arrow(data).wrap_err(report_failed_conversion_from_arrow::<F>(
+            .await?
+            .try_into()
+            .wrap_err(report_failed_conversion_from_arrow::<F>(
                 &self.raw.source,
                 &self.raw.layout,
-            ))?,
-        ))
+            ))
     }
 }

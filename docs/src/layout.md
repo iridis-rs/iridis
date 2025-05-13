@@ -20,7 +20,7 @@ let (_source, output) = layout
     .await;
 ```
 
-The `node` method will create a new node in the layout with the given name and will always return at least the associated `NodeLayout` object (which is just a label together with an uuid to represent this node). Inside the closure, you have access to a `Builder` that can add inputs, outputs and queries to the node. You can return anything you want from the closure, but it is recommended to return the result of the `builder` methods. This will allow you to use the `IOLayout` object later on to create the flows.
+The `node` method will create a new node in the layout with the given name and will always return at least the associated `NodeID` object (which is just a label together with an uuid to represent this node). Inside the closure, you have access to a `Builder` that can add inputs, outputs and queries to the node. You can return anything you want from the closure, but it is recommended to return the result of the `builder` methods. This will allow you to use the `PrimitiveID` object later on to create the flows.
 
 ## Flows
 

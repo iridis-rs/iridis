@@ -28,7 +28,10 @@ impl Node for MyClient {
     }
 
     async fn start(mut self: Box<Self>) -> Result<()> {
-        let (_, answer) = self
+        let TypedDataflowMessage {
+            header: _,
+            data: answer,
+        } = self
             .ask_128
             .query(100)
             .await
@@ -36,7 +39,10 @@ impl Node for MyClient {
 
         println!("Answer: {}", answer);
 
-        let (_, answer) = self
+        let TypedDataflowMessage {
+            header: _,
+            data: answer,
+        } = self
             .ask_128
             .query(200)
             .await
@@ -44,7 +50,10 @@ impl Node for MyClient {
 
         println!("Answer: {}", answer);
 
-        let (_, answer) = self
+        let TypedDataflowMessage {
+            header: _,
+            data: answer,
+        } = self
             .ask_64
             .query(100)
             .await
@@ -52,7 +61,10 @@ impl Node for MyClient {
 
         println!("Answer: {}", answer);
 
-        let (_, answer) = self
+        let TypedDataflowMessage {
+            header: _,
+            data: answer,
+        } = self
             .ask_64
             .query(2)
             .await

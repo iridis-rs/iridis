@@ -17,6 +17,4 @@ version.workspace = true
 eyre = { workspace = true }
 uuid = { workspace = true }
 tracing = { workspace = true }
-
-[dev-dependencies]
 tokio = { workspace = true }

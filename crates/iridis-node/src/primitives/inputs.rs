@@ -12,12 +12,12 @@ type Receivers = SharedMap<Uuid, MessageReceiver>;
 pub struct Inputs {
     receivers: Receivers,
 
-    source: NodeLayout,
+    source: NodeID,
 }
 
 impl Inputs {
     /// Creates a new Inputs instance.
-    pub fn new(receivers: Receivers, source: NodeLayout) -> Self {
+    pub fn new(receivers: Receivers, source: NodeID) -> Self {
         tracing::debug!(
             "Creating Inputs entry for node '{}' (uuid: {})",
             source.label,
@@ -27,10 +27,7 @@ impl Inputs {
         Self { receivers, source }
     }
 
-    async fn compute(
-        &mut self,
-        input: impl Into<String>,
-    ) -> Result<(MessageReceiver, InputLayout)> {
+    async fn compute(&mut self, input: impl Into<String>) -> Result<(MessageReceiver, InputID)> {
         let label: String = input.into();
         let layout = self.source.input(&label);
 

@@ -10,13 +10,8 @@ pub struct Output<T: ArrowMessage> {
 }
 
 impl<T: ArrowMessage> Output<T> {
-    /// Create a new typed Output from a MessageSender, NodeLayout, and OutputLayout
-    pub fn new(
-        tx: Vec<MessageSender>,
-        clock: Arc<HLC>,
-        source: NodeLayout,
-        layout: OutputLayout,
-    ) -> Self {
+    /// Create a new typed Output from a MessageSender, NodeID, and OutputID
+    pub fn new(tx: Vec<MessageSender>, clock: Arc<HLC>, source: NodeID, layout: OutputID) -> Self {
         Self {
             raw: RawOutput::new(tx, clock, source, layout),
             _phantom: std::marker::PhantomData,

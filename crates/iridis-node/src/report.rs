@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
-pub fn report_error_receiving(source: &NodeLayout, layout: impl Into<IOLayout>) -> eyre::Report {
-    let layout: IOLayout = layout.into();
+pub fn report_error_receiving(source: &NodeID, layout: impl Into<PrimitiveID>) -> eyre::Report {
+    let layout: PrimitiveID = layout.into();
 
     eyre::Report::msg(format!(
         "Node '{}' (uuid: {}) failed to receive data from io '{}' (uuid: {})",
@@ -12,8 +12,8 @@ pub fn report_error_receiving(source: &NodeLayout, layout: impl Into<IOLayout>) 
     ))
 }
 
-pub fn report_error_sending(source: &NodeLayout, layout: impl Into<IOLayout>) -> eyre::Report {
-    let layout: IOLayout = layout.into();
+pub fn report_error_sending(source: &NodeID, layout: impl Into<PrimitiveID>) -> eyre::Report {
+    let layout: PrimitiveID = layout.into();
 
     eyre::Report::msg(format!(
         "Node '{}' (uuid: {}) failed to send data to io '{}' (uuid: {})",
@@ -25,10 +25,10 @@ pub fn report_error_sending(source: &NodeLayout, layout: impl Into<IOLayout>) ->
 }
 
 pub fn report_failed_conversion_from_arrow<T>(
-    source: &NodeLayout,
-    layout: impl Into<IOLayout>,
+    source: &NodeID,
+    layout: impl Into<PrimitiveID>,
 ) -> eyre::Report {
-    let layout: IOLayout = layout.into();
+    let layout: PrimitiveID = layout.into();
 
     eyre::Report::msg(format!(
         "Node '{}' (uuid: {}) failed to convert arrow data from input '{}' (uuid: {}) to message T: {}",
@@ -41,10 +41,10 @@ pub fn report_failed_conversion_from_arrow<T>(
 }
 
 pub fn report_failed_conversion_to_arrow<T>(
-    source: &NodeLayout,
-    layout: impl Into<IOLayout>,
+    source: &NodeID,
+    layout: impl Into<PrimitiveID>,
 ) -> eyre::Report {
-    let layout: IOLayout = layout.into();
+    let layout: PrimitiveID = layout.into();
 
     eyre::Report::msg(format!(
         "Node '{}' (uuid: {}) failed to convert message T {} to arrow data for output '{}' (uuid: {})",
@@ -56,11 +56,11 @@ pub fn report_failed_conversion_to_arrow<T>(
     ))
 }
 
-pub fn report_io_not_found(source: &NodeLayout, layout: impl Into<IOLayout>) -> eyre::Report {
-    let layout: IOLayout = layout.into();
+pub fn report_io_not_found(source: &NodeID, layout: impl Into<PrimitiveID>) -> eyre::Report {
+    let layout: PrimitiveID = layout.into();
 
     eyre::Report::msg(format!(
-        "Input '{}' (uuid: {}) not found for node '{}'. The IO you're trying to create does not match the dataflow layout created.",
+        "Primitive '{}' (uuid: {}) not found for node '{}'. The primitive you're trying to create does not match the dataflow layout created.",
         layout.label(),
         layout.uuid(),
         source.label
