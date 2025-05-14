@@ -34,16 +34,14 @@ version = "0.3.4"
 eyre = { version = "0.6", default-features = false, features = [
     "auto-install",
 ] }
-
-url = { version = "2", default-features = false, features = ["std"] }
+url = "2"
 uhlc = { version = "0.8", default-features = false }
 
 serde_yml = "0.0.12"
 
 libloading = "0.8"
-
-proc-macro2 = "1"
-quote = "1"
+proc-macro2 = { version = "1", default-features = false }
+quote = { version = "1", default-features = false }
 syn = { version = "2", features = ["full"] }
 
 arrow-data = "55"
@@ -51,18 +49,19 @@ arrow-schema = "55"
 arrow-array = "55"
 arrow-buffer = "55"
 
-uuid = { version = "1", default-features = false, features = ["v4", "v3"] }
+uuid = { version = "1", default-features = false, features = ["v3", "v4"] }
 
 tokio = { version = "1", features = [
     "macros",
     "rt-multi-thread",
+    "signal",
     "sync",
     "time",
-    "signal",
 ] }
-
-tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", features = [
+    "fmt",
+], default-features = false }
 
 iridis-layout = { version = "0.3.4", path = "crates/iridis-layout" }
 

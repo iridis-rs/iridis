@@ -25,7 +25,6 @@ serde_yml = { workspace = true }
 libloading = { workspace = true }
 
 tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
 
 iridis-node = { workspace = true }
 iridis-runtime-core = { workspace = true }
@@ -33,4 +32,6 @@ iridis-builtins = { workspace = true }
 
 iridis-file-ext = { workspace = true }
 iridis-url-scheme = { workspace = true }
-iridis-layout = { workspace = true }
+
+[dev-dependencies]
+tracing-subscriber = { workspace = true }
