@@ -51,7 +51,7 @@ impl FileExtLoader {
         })
     }
 
-    pub fn load_statically_linked_plugin<T: FileExtPlugin + 'static>(&mut self) -> Result<()> {
+    pub fn load_statically_linked_plugin<T: FileExtPlugin + 'static>(&mut self) {
         self.plugins.spawn(async move {
             let plugin = T::new().await?.wrap_err(format!(
                 "Failed to load static plugin '{}'",
@@ -67,11 +67,9 @@ impl FileExtLoader {
 
             Ok((plugin.target(), plugin))
         });
-
-        Ok(())
     }
 
-    pub fn load_dynamically_linked_plugin(&mut self, path: PathBuf) -> Result<()> {
+    pub fn load_dynamically_linked_plugin(&mut self, path: PathBuf) {
         self.plugins.spawn(async move {
             match path.extension() {
                 Some(ext) => {
@@ -133,8 +131,6 @@ impl FileExtLoader {
                 _ => Err(eyre::eyre!("Unsupported path '{:?}'", path)),
             }
         });
-
-        Ok(())
     }
 
     pub async fn finish(&mut self) -> Result<HashMap<String, Arc<RuntimeFileExt>>> {

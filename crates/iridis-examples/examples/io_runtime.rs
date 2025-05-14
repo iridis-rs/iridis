@@ -42,15 +42,15 @@ async fn main() -> Result<()> {
                 iridis_examples::dylib("source", None)?,
                 source,
                 serde_yml::from_str("")?,
-            )?;
+            );
 
-            loader.load::<Transport>(operator, serde_yml::from_str("")?)?;
+            loader.load::<Transport>(operator, serde_yml::from_str("")?);
 
             loader.load_url(
                 iridis_examples::dylib("sink", None)?,
                 sink,
                 serde_yml::from_str("")?,
-            )?;
+            );
 
             Ok(())
         })

@@ -31,11 +31,7 @@ impl Loader {
     }
 
     /// Load a node from a Rust struct directly (statically linked)
-    pub fn load<T: Node + 'static>(
-        &mut self,
-        source: NodeID,
-        configuration: serde_yml::Value,
-    ) -> Result<()> {
+    pub fn load<T: Node + 'static>(&mut self, source: NodeID, configuration: serde_yml::Value) {
         let (inputs, outputs, queries, queryables) = self
             .flows
             .node_primitives(self.clock.clone(), source.clone());
@@ -59,18 +55,11 @@ impl Loader {
 
             Ok((source, node))
         });
-
-        Ok(())
     }
 
     /// Load a node from an URL. Be careful, you must ensure that the runtime has the necessary plugins to process this URL.
     /// By default you can pass all URL for the builtins nodes (builtin://) and all URL for dynamic libraries on the computer (file:///path/to/library.so)
-    pub fn load_url(
-        &mut self,
-        url: Url,
-        source: NodeID,
-        configuration: serde_yml::Value,
-    ) -> Result<()> {
+    pub fn load_url(&mut self, url: Url, source: NodeID, configuration: serde_yml::Value) {
         let (inputs, outputs, queries, queryables) = self
             .flows
             .node_primitives(self.clock.clone(), source.clone());
@@ -100,16 +89,13 @@ impl Loader {
 
             Ok((source, node))
         });
-
-        Ok(())
     }
 
     pub async fn finish(mut self) -> Result<HashMap<NodeID, RuntimeNode>> {
         let mut nodes = HashMap::new();
 
         while let Some(res) = self.futures.join_next().await {
-            let res = res?;
-            let (source, node) = res?;
+            let (source, node) = res??;
 
             nodes.insert(source, node);
         }

@@ -41,13 +41,13 @@ async fn main() -> Result<()> {
                 iridis_examples::dylib("service", None)?,
                 service,
                 serde_yml::from_str("")?,
-            )?;
+            );
 
             loader.load_url(
                 iridis_examples::dylib("client", None)?,
                 client,
                 serde_yml::from_str("")?,
-            )?;
+            );
 
             Ok(())
         })
