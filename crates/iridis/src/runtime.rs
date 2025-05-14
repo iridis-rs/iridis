@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::prelude::*;
+use crate::prelude::{thirdparty::tokio::task::JoinSet, *};
 
 /// Create a new runtime instance.
 pub struct Runtime {
@@ -20,20 +20,15 @@ impl Runtime {
         let mut file_ext = FileExtLoader::new().await?;
         let mut url_scheme = UrlSchemeLoader::new().await?;
 
-        file_ext
-            .load_statically_linked_plugin::<DefaultFileExtPlugin>()
-            .await?;
-
-        url_scheme
-            .load_statically_linked_plugin::<DefaultUrlSchemePlugin>()
-            .await?;
+        file_ext.load_statically_linked_plugin::<DefaultFileExtPlugin>()?;
+        url_scheme.load_statically_linked_plugin::<DefaultUrlSchemePlugin>()?;
 
         plugins(&mut file_ext, &mut url_scheme).await?;
 
         Ok(Self {
             clock: Arc::new(HLC::default()),
-            file_ext: Arc::new(FileExtManager::new(file_ext.plugins)),
-            url_scheme: Arc::new(UrlSchemeManager::new(url_scheme.plugins)),
+            file_ext: Arc::new(FileExtManager::new(file_ext.finish().await?)),
+            url_scheme: Arc::new(UrlSchemeManager::new(url_scheme.finish().await?)),
             nodes: HashMap::new(),
         })
     }
@@ -51,16 +46,16 @@ impl Runtime {
 
         nodes(&mut node_loader).await?;
 
-        self.nodes.extend(node_loader.nodes);
+        self.nodes.extend(node_loader.finish().await?);
 
-        let mut tasks = Vec::new();
+        let mut tasks = JoinSet::new();
         for (layout, node) in self.nodes {
-            tasks.push(tokio::spawn(async move {
+            tasks.spawn(async move {
                 node.run().await.wrap_err(format!(
                     "Node '{}' (uuid: {}) failed",
                     layout.label, layout.uuid,
                 ))
-            }));
+            });
         }
 
         let join_all = tokio::spawn(async move {
@@ -68,8 +63,8 @@ impl Runtime {
 
             let mut is_ok = true;
 
-            for task in tasks {
-                let result = task.await?;
+            while let Some(result) = tasks.join_next().await {
+                let result = result?;
 
                 if let Err(report) = result {
                     is_ok = false;

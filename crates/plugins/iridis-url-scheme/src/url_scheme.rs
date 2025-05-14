@@ -1,13 +1,16 @@
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
-use crate::prelude::{thirdparty::libloading, *};
+use crate::prelude::{
+    thirdparty::{libloading, tokio::task::JoinSet},
+    *,
+};
 
 pub struct UrlSchemeManager {
     pub plugins: HashMap<String, Arc<RuntimeUrlScheme>>,
 }
 
 pub struct UrlSchemeLoader {
-    pub plugins: HashMap<String, Arc<RuntimeUrlScheme>>,
+    pub plugins: JoinSet<Result<(Vec<String>, RuntimeUrlScheme)>>,
 }
 
 impl UrlSchemeManager {
@@ -50,95 +53,109 @@ impl UrlSchemeManager {
 impl UrlSchemeLoader {
     pub async fn new() -> Result<Self> {
         Ok(Self {
-            plugins: HashMap::new(),
+            plugins: JoinSet::new(),
         })
     }
 
-    pub async fn load_statically_linked_plugin<T: UrlSchemePlugin + 'static>(
-        &mut self,
-    ) -> Result<()> {
-        let plugin = T::new().await?.wrap_err(format!(
-            "Failed to load static plugin '{}'",
-            std::any::type_name::<T>(),
-        ))?;
+    pub fn load_statically_linked_plugin<T: UrlSchemePlugin + 'static>(&mut self) -> Result<()> {
+        self.plugins.spawn(async move {
+            let plugin = T::new().await?.wrap_err(format!(
+                "Failed to load static plugin '{}'",
+                std::any::type_name::<T>(),
+            ))?;
 
-        let plugin = Arc::new(RuntimeUrlScheme::StaticallyLinked(plugin));
+            let plugin = RuntimeUrlScheme::StaticallyLinked(plugin);
 
-        for ext in &plugin.target() {
-            self.plugins.insert(ext.to_string(), plugin.clone());
-        }
+            tracing::debug!(
+                "Loaded statically linked plugin: {}",
+                std::any::type_name::<T>()
+            );
 
-        tracing::debug!(
-            "Loaded statically linked plugin: {}",
-            std::any::type_name::<T>()
-        );
+            Ok((plugin.target(), plugin))
+        });
 
         Ok(())
     }
 
-    pub async fn load_dynamically_linked_plugin(&mut self, path: PathBuf) -> Result<()> {
-        match path.extension() {
-            Some(ext) => {
-                if ext == std::env::consts::DLL_EXTENSION {
-                    let path_buf = path.clone();
-                    let (library, constructor) = tokio::task::spawn_blocking(move || {
-                            let library = unsafe {
-                                #[cfg(target_family = "unix")]
-                                let library = libloading::os::unix::Library::open(
-                                    Some(path_buf.clone()),
-                                    libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-                                )
-                                .wrap_err(format!("Failed to load path {:?}", path_buf))?;
-
-                                #[cfg(not(target_family = "unix"))]
-                                let library = Library::new(path_buf.clone())
+    pub fn load_dynamically_linked_plugin(&mut self, path: PathBuf) -> Result<()> {
+        self.plugins.spawn(async move {
+            match path.extension() {
+                Some(ext) => {
+                    if ext == std::env::consts::DLL_EXTENSION {
+                        let path_buf = path.clone();
+                        let (library, constructor) = tokio::task::spawn_blocking(move || {
+                                let library = unsafe {
+                                    #[cfg(target_family = "unix")]
+                                    let library = libloading::os::unix::Library::open(
+                                        Some(path_buf.clone()),
+                                        libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+                                    )
                                     .wrap_err(format!("Failed to load path {:?}", path_buf))?;
 
-                                library
-                            };
+                                    #[cfg(not(target_family = "unix"))]
+                                    let library = Library::new(path_buf.clone())
+                                        .wrap_err(format!("Failed to load path {:?}", path_buf))?;
 
-                            let constructor = unsafe {
-                                library
-                                .get::<*mut DynamicallyLinkedUrlSchemePluginInstance>(
-                                    b"IRIDIS_URL_SCHEME_PLUGIN",
-                                )
-                                .wrap_err(format!(
-                                    "Failed to load symbol 'IRIDIS_URL_SCHEME_PLUGIN' from cdylib {:?}",
-                                    path_buf
-                                ))?
-                                .read()
-                            };
+                                    library
+                                };
 
-                            Ok::<_, eyre::Report>((library, constructor))
-                        })
-                        .await??;
+                                let constructor = unsafe {
+                                    library
+                                    .get::<*mut DynamicallyLinkedUrlSchemePluginInstance>(
+                                        b"IRIDIS_URL_SCHEME_PLUGIN",
+                                    )
+                                    .wrap_err(format!(
+                                        "Failed to load symbol 'IRIDIS_URL_SCHEME_PLUGIN' from cdylib {:?}",
+                                        path_buf
+                                    ))?
+                                    .read()
+                                };
 
-                    let plugin = Arc::new(RuntimeUrlScheme::DynamicallyLinked(
-                        DynamicallyLinkedUrlSchemePlugin {
-                            _library: library,
-                            handle: (constructor)().await?.wrap_err(format!(
-                                "Failed to load dynamically linked plugin '{:?}'",
-                                path,
-                            ))?,
-                        },
-                    ));
+                                Ok::<_, eyre::Report>((library, constructor))
+                            })
+                            .await??;
 
-                    for ext in &plugin.target() {
-                        self.plugins.insert(ext.to_string(), plugin.clone());
+                        let plugin = RuntimeUrlScheme::DynamicallyLinked(
+                            DynamicallyLinkedUrlSchemePlugin {
+                                _library: library,
+                                handle: (constructor)().await?.wrap_err(format!(
+                                    "Failed to load dynamically linked plugin '{:?}'",
+                                    path,
+                                ))?,
+                            },
+                        );
+
+                        tracing::debug!(
+                            "Loaded dynamically linked plugin from path: {}",
+                            path.display()
+                        );
+
+                        Ok((plugin.target(), plugin))
+                    } else {
+                        Err(eyre::eyre!("Extension '{:?}' is not supported", ext))
                     }
-
-                    tracing::debug!(
-                        "Loaded dynamically linked plugin from path: {}",
-                        path.display()
-                    );
-
-                    Ok(())
-                } else {
-                    Err(eyre::eyre!("Extension '{:?}' is not supported", ext))
                 }
+                _ => Err(eyre::eyre!("Unsupported path '{:?}'", path)),
             }
-            _ => Err(eyre::eyre!("Unsupported path '{:?}'", path)),
+        });
+
+        Ok(())
+    }
+
+    pub async fn finish(&mut self) -> Result<HashMap<String, Arc<RuntimeUrlScheme>>> {
+        let mut plugins = HashMap::new();
+
+        while let Some(result) = self.plugins.join_next().await {
+            let (targets, plugin) = result??;
+
+            let plugin = Arc::new(plugin);
+
+            for target in targets {
+                plugins.insert(target, plugin.clone());
+            }
         }
+
+        Ok(plugins)
     }
 }
 

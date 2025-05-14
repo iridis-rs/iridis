@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::prelude::*;
+use crate::prelude::{thirdparty::tokio::task::JoinSet, *};
 
 /// Loader struct passed to the user closure to load nodes
 pub struct Loader {
@@ -10,7 +10,8 @@ pub struct Loader {
     pub clock: Arc<HLC>,
 
     pub flows: RuntimeFlows,
-    pub nodes: HashMap<NodeID, RuntimeNode>,
+
+    pub futures: JoinSet<Result<(NodeID, RuntimeNode)>>,
 }
 
 impl Loader {
@@ -25,12 +26,12 @@ impl Loader {
             url_scheme,
             clock,
             flows,
-            nodes: HashMap::new(),
+            futures: JoinSet::new(),
         }
     }
 
     /// Load a node from a Rust struct directly (statically linked)
-    pub async fn load<T: Node + 'static>(
+    pub fn load<T: Node + 'static>(
         &mut self,
         source: NodeID,
         configuration: serde_yml::Value,
@@ -39,29 +40,32 @@ impl Loader {
             .flows
             .node_primitives(self.clock.clone(), source.clone());
 
-        let node = RuntimeNode::StaticallyLinked(
-            T::new(inputs, outputs, queries, queryables, configuration)
-                .await?
-                .wrap_err(format!(
-                    "Node '{}' (uuid: {}) failed to initialize",
-                    source.label, source.uuid,
-                ))?,
-        );
+        self.futures.spawn(async move {
+            let node = RuntimeNode::StaticallyLinked(
+                T::new(inputs, outputs, queries, queryables, configuration)
+                    .await?
+                    .wrap_err(format!(
+                        "Node '{}' (uuid: {}) failed to initialize",
+                        source.label, source.uuid,
+                    ))?,
+            );
 
-        tracing::debug!(
-            "Node '{}' (uuid: {}) loaded from Rust struct {}",
-            source.label,
-            source.uuid,
-            std::any::type_name::<T>()
-        );
+            tracing::debug!(
+                "Node '{}' (uuid: {}) loaded from Rust struct {}",
+                source.label,
+                source.uuid,
+                std::any::type_name::<T>()
+            );
 
-        self.nodes.insert(source, node);
+            Ok((source, node))
+        });
+
         Ok(())
     }
 
     /// Load a node from an URL. Be careful, you must ensure that the runtime has the necessary plugins to process this URL.
     /// By default you can pass all URL for the builtins nodes (builtin://) and all URL for dynamic libraries on the computer (file:///path/to/library.so)
-    pub async fn load_url(
+    pub fn load_url(
         &mut self,
         url: Url,
         source: NodeID,
@@ -71,28 +75,45 @@ impl Loader {
             .flows
             .node_primitives(self.clock.clone(), source.clone());
 
-        let node = self
-            .url_scheme
-            .load(
-                url.clone(),
-                inputs,
-                outputs,
-                queries,
-                queryables,
-                configuration,
-                self.file_ext.clone(),
-            )
-            .await?;
+        let file_ext = self.file_ext.clone();
+        let url_scheme = self.url_scheme.clone();
 
-        tracing::debug!(
-            "Node '{}' (uuid: {}) loaded from URL {:?}",
-            source.label,
-            source.uuid,
-            url
-        );
+        self.futures.spawn(async move {
+            let node = url_scheme
+                .load(
+                    url.clone(),
+                    inputs,
+                    outputs,
+                    queries,
+                    queryables,
+                    configuration,
+                    file_ext,
+                )
+                .await?;
 
-        self.nodes.insert(source, node);
+            tracing::debug!(
+                "Node '{}' (uuid: {}) loaded from URL {:?}",
+                source.label,
+                source.uuid,
+                url
+            );
+
+            Ok((source, node))
+        });
 
         Ok(())
+    }
+
+    pub async fn finish(mut self) -> Result<HashMap<NodeID, RuntimeNode>> {
+        let mut nodes = HashMap::new();
+
+        while let Some(res) = self.futures.join_next().await {
+            let res = res?;
+            let (source, node) = res?;
+
+            nodes.insert(source, node);
+        }
+
+        Ok(nodes)
     }
 }

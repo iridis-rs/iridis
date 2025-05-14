@@ -38,25 +38,19 @@ async fn main() -> Result<()> {
 
     runtime
         .run(layout, async move |loader: &mut Loader| {
-            loader
-                .load_url(
-                    iridis_examples::dylib("source", None)?,
-                    source,
-                    serde_yml::from_str("")?,
-                )
-                .await?;
+            loader.load_url(
+                iridis_examples::dylib("source", None)?,
+                source,
+                serde_yml::from_str("")?,
+            )?;
 
-            loader
-                .load::<Transport>(operator, serde_yml::from_str("")?)
-                .await?;
+            loader.load::<Transport>(operator, serde_yml::from_str("")?)?;
 
-            loader
-                .load_url(
-                    iridis_examples::dylib("sink", None)?,
-                    sink,
-                    serde_yml::from_str("")?,
-                )
-                .await?;
+            loader.load_url(
+                iridis_examples::dylib("sink", None)?,
+                sink,
+                serde_yml::from_str("")?,
+            )?;
 
             Ok(())
         })
