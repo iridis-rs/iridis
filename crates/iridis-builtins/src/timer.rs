@@ -1,3 +1,6 @@
+//! This module contains the built-in `Tomer` node, which is a simple
+//! source node that emits a "tick" message at a specified frequency.
+
 use std::time::Duration;
 
 use crate::prelude::*;

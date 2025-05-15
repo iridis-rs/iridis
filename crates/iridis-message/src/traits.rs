@@ -1,3 +1,5 @@
+//! This module contains the `ArrowMessage` triatt and its implementation for various types.
+
 use std::sync::Arc;
 
 use crate::prelude::*;

@@ -1,3 +1,6 @@
+//! This module contains the macro `ArrowMessage`.
+//! It's used to generate the necessary boilerplate code for creating an Arrow message.
+
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
@@ -7,6 +10,13 @@ use syn::{
     token::Comma,
 };
 
+/// Apply this macro to a struct or enum to implement the `ArrowMessage` trait.
+///
+/// All fields of the struct must implement the `ArrowMessage` trait. This is the only
+/// constraint for the struct.
+///
+/// Rust primitives like `u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64`, `f32`, `f64` and
+/// Optionals of these types already implement the `ArrowMessage` trait, as well as all `arrow::array` types.
 #[proc_macro_derive(ArrowMessage)]
 pub fn from_into_arrow_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

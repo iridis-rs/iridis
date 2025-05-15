@@ -1,3 +1,6 @@
+//! This module contains the built-in `Printer` node, which is a simple
+//! sink node that just prints its input
+
 use crate::prelude::*;
 
 /// Simple sink node that just prints its input to stdout.

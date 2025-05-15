@@ -1,29 +1,36 @@
+//! This module defines all the primitive IDs used in the `dataflow` application.
+
 use crate::prelude::*;
 
+/// Represents a unique identifier for an Input in the graph.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InputID {
     pub label: String,
     pub uuid: Uuid,
 }
 
+/// Represents a unique identifier for an Output in the graph.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutputID {
     pub label: String,
     pub uuid: Uuid,
 }
 
+/// Represents a unique identifier for a Query in the graph.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct QueryID {
     pub label: String,
     pub uuid: Uuid,
 }
 
+/// Represents a unique identifier for a Queryable in the graph.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct QueryableID {
     pub label: String,
     pub uuid: Uuid,
 }
 
+/// Represents a unique identifier for a primitive in the graph.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PrimitiveID {
     Input(InputID),

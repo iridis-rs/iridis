@@ -1,7 +1,10 @@
+//! This module defines the 'flows' part of the `dataflow` application.
+
 use std::collections::HashSet;
 
 use crate::prelude::*;
 
+/// Represents the flows of the application.
 #[derive(Debug, Clone)]
 pub struct FlowLayout {
     pub connections: HashSet<(Uuid, Uuid)>, // Send -> Receive
@@ -20,6 +23,7 @@ impl FlowLayout {
             .insert((*query.as_ref(), *queryable.as_ref()));
     }
 
+    /// Connects two primitives in the graph. The order does not matter.
     pub fn connect(&mut self, a: impl Into<PrimitiveID>, b: impl Into<PrimitiveID>) -> Result<()> {
         let (a, b) = (a.into(), b.into());
 

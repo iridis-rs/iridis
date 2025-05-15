@@ -1,5 +1,8 @@
+//! This module defines the `core` elements common to crates related to the `runtime`.
+
 pub(crate) mod node;
 
+/// This prelude contains everything you need to use this crate.
 pub mod prelude {
     pub use crate::node::*;
 

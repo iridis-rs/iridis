@@ -1,6 +1,9 @@
+//! This module defines `ArrowMessage` trait and its implementation for structs and enums.
+
 pub(crate) mod helper;
 pub(crate) mod traits;
 
+/// This prelude contains everything you need to use this crate.
 pub mod prelude {
     pub use crate::helper::*;
     pub use crate::traits::*;

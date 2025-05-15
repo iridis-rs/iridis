@@ -1,3 +1,6 @@
+//! This module contains all the built-in nodes that can be used directly
+//! by the user.
+
 use crate::prelude::*;
 
 /// Enumeration of built-in nodes.

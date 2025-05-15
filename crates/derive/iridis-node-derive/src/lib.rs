@@ -1,3 +1,5 @@
+//! This module contains the macros `Node` and `node(runtime)`.
+//! It's used to generate the necessary boilerplate code for creating a node.
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
@@ -9,6 +11,8 @@ use syn::{
     punctuated::Punctuated,
 };
 
+/// Apply this macro to a struct to generate the `C` symbols
+/// and the according `tokio::runtime::Runtime`.
 #[proc_macro_derive(Node)]
 pub fn derive_node(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -66,6 +70,26 @@ impl Parse for MacroArgs {
     }
 }
 
+/// Use this macro to mark an `impl` block on a node. This will alter
+/// the `new` and `start` methods to return a `tokio::task::JoinHandle` with the provided
+/// runtime. The parameter must be a function that takes an `async` closure and returns
+/// a `JoinHandle`.
+///
+/// ```rust
+/// static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
+///     std::sync::LazyLock::new(|| {
+///         tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime")
+///     });
+///
+/// fn default_runtime<T: Send + 'static>(
+///     task: impl Future<Output = T> + Send + 'static,
+/// ) -> tokio::task::JoinHandle<T> {
+///     match tokio::runtime::Handle::try_current() {
+///         Ok(handle) => handle.spawn(task),
+///         Err(_) => DEFAULT_TOKIO_RUNTIME.spawn(task),
+///     }
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn node(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut impl_block = parse_macro_input!(item as ItemImpl);

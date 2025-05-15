@@ -1,3 +1,5 @@
+//! This module defines the complete layout of a `dataflow` application.
+
 use std::{
     collections::{HashMap, HashSet},
     fmt,
@@ -6,6 +8,7 @@ use std::{
 
 use crate::prelude::{thirdparty::tokio::sync::Mutex, *};
 
+/// Represents the data layout of the application.
 #[derive(Debug, Clone)]
 pub struct DataLayout {
     pub inputs: HashSet<Uuid>,
@@ -14,6 +17,8 @@ pub struct DataLayout {
     pub queryables: HashSet<Uuid>,
 }
 
+/// Represents the debug layout of the application: the labels
+/// and the nodes/primitives relationship.
 #[derive(Debug, Clone)]
 pub struct DebugLayout {
     pub labels: HashMap<Uuid, String>,
@@ -21,11 +26,14 @@ pub struct DebugLayout {
 }
 
 impl DebugLayout {
+    /// Gets the label of a primitive or a Node by its UUID.
     pub fn label(&self, uuid: impl AsRef<Uuid>) -> String {
         self.labels.get(uuid.as_ref()).cloned().unwrap_or_default()
     }
 }
 
+/// Represents the a `Dataflow` application! This is the main
+/// struct that contains all the data and debug layouts.
 #[derive(Clone)]
 pub struct DataflowLayout {
     pub data: DataLayout,
@@ -33,6 +41,8 @@ pub struct DataflowLayout {
     pub flows: FlowLayout,
 }
 
+/// Represents a shared `Data` only layout. It is used to construct
+/// a `DataflowLayout` easily.
 #[derive(Debug, Clone)]
 pub struct SharedDataLayout {
     pub data: Arc<Mutex<DataLayout>>,
@@ -40,6 +50,8 @@ pub struct SharedDataLayout {
 }
 
 impl DataflowLayout {
+    /// Creates a new empty `SharedDataLayout` that must be `finished` to create
+    /// the final `DataflowLayout`.
     pub fn empty() -> SharedDataLayout {
         SharedDataLayout {
             data: Arc::new(Mutex::new(DataLayout {
@@ -55,12 +67,15 @@ impl DataflowLayout {
         }
     }
 
+    /// Gets the label of a primitive or a Node by its UUID.
     pub fn label(&self, uuid: impl AsRef<Uuid>) -> String {
         self.debug.label(uuid)
     }
 }
 
 impl SharedDataLayout {
+    /// Creates a new `Node` with the given label. Provide an `async` closure
+    /// to add primitives to the node (such as Inputs, Queries etc...)
     pub async fn node<T>(
         &self,
         label: impl Into<String>,
@@ -100,6 +115,9 @@ impl SharedDataLayout {
         (id, result)
     }
 
+    /// Creates a `DataflowLayout` from the current `SharedDataLayout` and the given
+    /// `flows` function. The `flows` function is an `async` closure that takes a
+    /// `FlowLayout` that can be used to connect the primitives together.
     pub async fn finish(
         self,
         flows: impl AsyncFnOnce(&mut FlowLayout) -> Result<()>,

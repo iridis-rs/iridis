@@ -1,3 +1,7 @@
+//! This module contains the built-in `Transport` node, which is a simple
+//! operator that does nothing, it just passes its input to its output,
+//! updating the Header of the message with the current time.
+
 use crate::prelude::*;
 
 /// Simple operator that does nothing, it just passes its input to its output.

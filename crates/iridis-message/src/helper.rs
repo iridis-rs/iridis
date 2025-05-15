@@ -1,3 +1,5 @@
+//! Some helper functions for working with Arrow data types and arrays.
+
 use std::{collections::HashMap, sync::Arc};
 
 use crate::prelude::*;

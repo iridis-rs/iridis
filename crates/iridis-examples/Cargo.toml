@@ -43,3 +43,6 @@ crate-type = ["cdylib"]
 name = "client"
 path = "examples/client.rs"
 crate-type = ["cdylib"]
+
+[package.metadata.release]
+release = false
