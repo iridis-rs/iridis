@@ -497,7 +497,7 @@ dependencies = [
 
 [[package]]
 name = "iridis"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "iridis-builtins",
@@ -516,7 +516,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-builtins"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "iridis-node",
@@ -526,7 +526,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-examples"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "iridis",
  "iridis-message",
@@ -536,7 +536,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-file-ext"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "iridis-file-ext-derive",
@@ -550,7 +550,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-file-ext-derive"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -559,7 +559,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-layout"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "tokio",
@@ -569,7 +569,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-message"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "arrow-array",
  "arrow-buffer",
@@ -581,7 +581,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-message-derive"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "quote",
  "syn",
@@ -589,7 +589,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-node"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "arrow-array",
  "arrow-data",
@@ -606,7 +606,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-node-derive"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -615,7 +615,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-runtime-core"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "iridis-node",
@@ -624,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-tests"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "iridis",
  "iridis-message",
@@ -634,7 +634,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-url-scheme"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "eyre",
  "iridis-file-ext",
@@ -648,7 +648,7 @@ dependencies = [
 
 [[package]]
 name = "iridis-url-scheme-derive"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "proc-macro2",
  "quote",
