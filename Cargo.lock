@@ -623,6 +623,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "iridis-tests"
+version = "0.3.4"
+dependencies = [
+ "iridis",
+ "iridis-message",
+ "iridis-node",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "iridis-url-scheme"
 version = "0.3.4"
 dependencies = [

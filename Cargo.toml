@@ -13,6 +13,7 @@ members = [
     "crates/derive/iridis-file-ext-derive",
     "crates/derive/iridis-url-scheme-derive",
     "crates/iridis-examples",
+    "crates/iridis-tests",
 ]
 resolver = "3"
 
@@ -25,7 +26,7 @@ keywords = []
 readme = "README.md"
 rust-version = "1.86.0"
 categories = []
-documentation = "https://iridis-rs.github.io/iridis/"
+documentation = "https://docs.rs/iridis/latest/iridis/"
 license = "Apache-2.0"
 repository = "https://github.com/iridis-rs/iridis"
 version = "0.3.4"
@@ -81,7 +82,6 @@ iridis-url-scheme = { version = "0.3.4", path = "crates/plugins/iridis-url-schem
 iridis-url-scheme-derive = { version = "0.3.4", path = "crates/derive/iridis-url-scheme-derive" }
 
 iridis = { version = "0.3.4", path = "crates/iridis" }
-
 
 [workspace.metadata.release]
 rate-limit.new-packages = 10
