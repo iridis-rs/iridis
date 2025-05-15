@@ -1,3 +1,5 @@
+//! This module contains implementations for this primitive.
+
 use crate::prelude::*;
 
 /// Not typed Input to receive data from the dataflow

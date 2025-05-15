@@ -1,7 +1,8 @@
+//! This module contains implementations for this primitive.
+
 use std::{collections::HashMap, sync::Arc};
 
-use crate::prelude::*;
-use thirdparty::arrow_data::ArrayData;
+use crate::prelude::{thirdparty::arrow_data::ArrayData, *};
 
 /// Not typed Queryable to receive data from the dataflow
 pub struct RawQueryable {

@@ -1,7 +1,11 @@
+//! This module defines the default url scheme plugin for the `iridis` runtime.
+
 use std::sync::Arc;
 
 use crate::prelude::*;
 
+/// The actual struct that implements the `UrlSchemePlugin` trait. This Default
+/// plugin loads files and builtin nodes.
 #[derive(UrlSchemePlugin)]
 pub struct DefaultUrlSchemePlugin {}
 
@@ -14,6 +18,8 @@ impl UrlSchemePlugin for DefaultUrlSchemePlugin {
         Ok(DefaultUrlSchemePlugin {})
     }
 
+    /// The url schemes that this plugin supports, by default it is `file` and
+    /// `builtin`
     fn target(&self) -> Vec<String> {
         vec!["file".to_string(), "builtin".to_string()]
     }

@@ -1,8 +1,11 @@
+//! This module contains the `iridis` runtime. It can be used to
+//! load and run a `DataflowLayout`
+
 use std::{collections::HashMap, sync::Arc};
 
 use crate::prelude::{thirdparty::tokio::task::JoinSet, *};
 
-/// Create a new runtime instance.
+/// Represents a runtime, with a clock, a set of nodes, and a set of plugins.
 pub struct Runtime {
     pub clock: Arc<HLC>,
 
@@ -13,7 +16,7 @@ pub struct Runtime {
 }
 
 impl Runtime {
-    /// Create a new runtime instance with plugins.
+    /// Create a new runtime instance with some plugins.
     pub async fn new(
         plugins: impl AsyncFnOnce(&mut FileExtLoader, &mut UrlSchemeLoader) -> Result<()>,
     ) -> Result<Self> {
@@ -33,7 +36,7 @@ impl Runtime {
         })
     }
 
-    /// Load all nodes with the flows provided and run them all.
+    /// Load all nodes with the layout provided and run them all.
     pub async fn run(
         mut self,
         layout: Arc<DataflowLayout>,

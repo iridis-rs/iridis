@@ -1,8 +1,11 @@
+//! This module contains everything to write an `iridis` node.
+
 pub(crate) mod message;
 pub(crate) mod node;
 pub(crate) mod primitives;
 pub(crate) mod report;
 
+/// This prelude contains everything you need to use this crate.
 pub mod prelude {
     pub use crate::message::*;
     pub use crate::node::*;

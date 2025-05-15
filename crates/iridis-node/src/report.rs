@@ -1,3 +1,5 @@
+//! This module defines some report messages for internal use
+
 use crate::prelude::*;
 
 pub fn report_error_receiving(source: &NodeID, layout: impl Into<PrimitiveID>) -> eyre::Report {

@@ -1,3 +1,6 @@
+//! This module contains the `iridis` runtime. It can be used to
+//! load and run a `DataflowLayout`
+
 pub(crate) mod flows;
 pub(crate) mod loader;
 pub(crate) mod report;
@@ -5,6 +8,7 @@ pub(crate) mod runtime;
 
 pub(crate) mod plugins;
 
+/// This prelude contains everything you need to use this crate.
 pub mod prelude {
     pub use crate::flows::*;
     pub use crate::loader::*;

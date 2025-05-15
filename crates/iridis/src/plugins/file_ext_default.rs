@@ -1,5 +1,9 @@
+//! This module defines the default file extension plugin for the `iridis` runtime.
+
 use crate::prelude::{thirdparty::libloading, *};
 
+/// The actual struct that implements the `FileExtPlugin` trait. This Default
+/// plugin loads dynamic libraries.
 #[derive(FileExtPlugin)]
 pub struct DefaultFileExtPlugin {}
 
@@ -12,6 +16,8 @@ impl FileExtPlugin for DefaultFileExtPlugin {
         Ok(DefaultFileExtPlugin {})
     }
 
+    /// The file extensions that this plugin supports, by default it is all
+    /// dynamic libraries
     fn target(&self) -> Vec<String> {
         vec!["so".to_string(), "dylib".to_string(), "dll".to_string()]
     }

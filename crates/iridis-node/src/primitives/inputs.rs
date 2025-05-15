@@ -1,8 +1,8 @@
+//! This module contains implementations for this primitive.
+
 use std::{collections::HashMap, sync::Arc};
 
-use crate::prelude::*;
-
-use thirdparty::tokio::sync::Mutex;
+use crate::prelude::{thirdparty::tokio::sync::Mutex, *};
 
 type SharedMap<K, V> = Arc<Mutex<HashMap<K, V>>>;
 type Receivers = SharedMap<Uuid, MessageReceiver>;

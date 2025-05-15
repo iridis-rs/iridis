@@ -1,3 +1,5 @@
+//! This module defines some report messages for internal use
+
 use iridis_node::prelude::thirdparty::Uuid;
 
 use crate::prelude::*;

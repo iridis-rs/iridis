@@ -1,3 +1,5 @@
+//! This module defines all the primitives for node communication.
+
 pub(crate) mod input;
 pub(crate) mod inputs;
 pub(crate) mod raw_input;

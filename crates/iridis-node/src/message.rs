@@ -1,3 +1,5 @@
+//! This module defines a message type for the dataflow communication
+
 use arrow_data::ArrayData;
 use tokio::sync::mpsc::{Receiver, Sender};
 use uuid::Uuid;

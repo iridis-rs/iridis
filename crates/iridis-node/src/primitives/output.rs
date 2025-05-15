@@ -1,7 +1,8 @@
+//! This module contains implementations for this primitive.
+
 use std::sync::Arc;
 
-use crate::prelude::*;
-use thirdparty::arrow_array::Array;
+use crate::prelude::{thirdparty::arrow_array::Array, *};
 
 /// Typed Output to receive data from the dataflow
 pub struct Output<T: ArrowMessage> {

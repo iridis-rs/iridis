@@ -1,3 +1,6 @@
+//! This module contains the necessary channels to communicate between
+//! the different nodes in the dataflow.
+
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
@@ -11,6 +14,8 @@ use crate::prelude::{
 
 type SharedMap<K, V> = Arc<Mutex<HashMap<K, V>>>;
 
+/// This struct contains the channels used to communicate between
+/// the different nodes in the dataflow.
 pub struct RuntimeFlows {
     pub inputs_receivers: SharedMap<Uuid, MessageReceiver>,
     pub outputs_senders: SharedMap<Uuid, Vec<MessageSender>>,
@@ -23,6 +28,7 @@ pub struct RuntimeFlows {
 }
 
 impl RuntimeFlows {
+    /// Creates a new `RuntimeFlows` struct from a `DataflowLayout`.
     pub fn new(layout: Arc<DataflowLayout>) -> Result<Self> {
         let mut inputs_receivers = HashMap::new();
         let mut outputs_senders = HashMap::new();
@@ -107,6 +113,7 @@ impl RuntimeFlows {
         })
     }
 
+    /// Extracts the `Inputs`, `Outputs`, `Queries` and `Queryables` for a given node
     pub fn node_primitives(
         &mut self,
         clock: Arc<HLC>,

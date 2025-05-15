@@ -1,3 +1,6 @@
+//! This module defines the nodes `Loader`, used by the user
+//! in order to load nodes in the runtime.
+
 use std::{collections::HashMap, sync::Arc};
 
 use crate::prelude::{thirdparty::tokio::task::JoinSet, *};
@@ -91,6 +94,7 @@ impl Loader {
         });
     }
 
+    /// `await` for all nodes to be loaded and return them
     pub async fn finish(mut self) -> Result<HashMap<NodeID, RuntimeNode>> {
         let mut nodes = HashMap::new();
 
