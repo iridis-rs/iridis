@@ -59,35 +59,32 @@ use iridis::prelude::{thirdparty::*, *};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let mut layout = DataflowLayout::new();
+    let layout = DataflowLayout::empty();
 
     let (source, output) = layout
-        .node("source", async |builder: &mut Builder| {
+        .node("source", async |builder: &mut NodeLayout| {
             builder.output("out")
         })
         .await;
 
     let (operator, (op_in, op_out)) = layout
-        .node("operator", async |builder: &mut Builder| {
+        .node("operator", async |builder: &mut NodeLayout| {
             (builder.input("in"), builder.output("out"))
         })
         .await;
 
     let (sink, input) = layout
-        .node("sink", async |builder: &mut Builder| {
-            builder.input("in")
-        })
+        .node("sink", async |builder: &mut NodeLayout| builder.input("in"))
         .await;
 
-    let layout = layout.build();
+    let layout = layout
+        .finish(async |flows| {
+            flows.connect(op_in, output)?;
+            flows.connect(input, op_out)?;
 
-    let flows = Flows::new(layout.clone(), async move |flows: &mut Connector| {
-        flows.connect(op_in, output, None)?;
-        flows.connect(input, op_out, None)?;
-
-        Ok(())
-    })
-    .await?;
+            Ok(())
+        })
+        .await?;
 
     Ok(())
 }
@@ -104,18 +101,15 @@ let runtime = Runtime::new(
 .await?;
 
 runtime
-    .run(flows, async move |loader: &mut Loader| {
+    .run(layout, async move |loader: &mut Loader| {
         loader
-            .load::<Timer>(source, serde_yml::from_str("frequency: 1.0")?)
-            .await?;
+            .load::<Timer>(source, serde_yml::from_str("frequency: 1.0")?)?;
 
         loader
-            .load::<Transport>(operator, serde_yml::from_str("")?)
-            .await?;
+            .load::<Transport>(operator, serde_yml::from_str("")?)?;
 
         loader
-            .load::<Printer>(sink, serde_yml::from_str("")?)
-            .await?;
+            .load::<Printer>(sink, serde_yml::from_str("")?)?;
 
         Ok(())
     })
@@ -126,8 +120,7 @@ runtime
 In this example, three nodes are loaded as statically linked libraries. However, it’s also possible to load a node dynamically from a URL. The node must be compiled as a `cdylib` with the `cdylib` feature flag enabled:
 
 ```rust
-loader.load_url(Url::parse("file:///path/to/timer.so")?, source, serde_yml::from_str("frequency: 1.0")?)
-    .await?;
+loader.load_url(Url::parse("file:///path/to/timer.so")?, source, serde_yml::from_str("frequency: 1.0")?)?;
 ```
 
 For a complete example of a project with multiple nodes—both statically linked and dynamically loaded—see [iridis-benchmark](https://github.com/iridis-rs/iridis-benchmark).

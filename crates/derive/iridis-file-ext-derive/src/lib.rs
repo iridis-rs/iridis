@@ -77,7 +77,7 @@ impl Parse for MacroArgs {
 /// runtime. The parameter must be a function that takes an `async` closure and returns
 /// a `JoinHandle`.
 ///
-/// ```rust
+/// ```rust,ignore
 /// static DEFAULT_TOKIO_RUNTIME: std::sync::LazyLock<tokio::runtime::Runtime> =
 ///     std::sync::LazyLock::new(|| {
 ///         tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime")

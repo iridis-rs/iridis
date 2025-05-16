@@ -23,8 +23,8 @@ async fn main() -> Result<()> {
 
     let layout = layout
         .finish(async move |flows| {
-            flows.connect(ask_128, compare_to_128.clone())?;
-            flows.connect(ask_64, compare_to_64.clone())?;
+            flows.connect(ask_128, compare_to_128)?;
+            flows.connect(ask_64, compare_to_64)?;
 
             Ok(())
         })
